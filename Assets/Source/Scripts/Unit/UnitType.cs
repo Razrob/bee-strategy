@@ -2,4 +2,5 @@
 {
     AttackUnit,
     MovingUnit,
+    Worker = 30,
 }
