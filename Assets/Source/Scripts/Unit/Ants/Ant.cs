@@ -5,16 +5,35 @@ namespace Unit.Ants
 {
     public class Ant : AntUnit
     {
-        private UnitVisibleZone _visibleZone;
+        [SerializeField] private AntProfessionType startProfession = AntProfessionType.Worker;
+        [SerializeField] private UnitVisibleZone visibleZone;
+        
         private AntHandItem _handItem;
-        private WorkerLogic _workerLogic;
-        private AttackLogicBase _attackLogic;
+        private LogicBlockBase _antProfessionLogic;
+
+        private MeleeAttackLogic _meleeAttackLogic;
+        private RangeAttackLogic _rangeAttackLogic;
         
         private void Start()
         {
             UnitPool.Instance.UnitCreation(this);
+            SwitchProfession(startProfession, new AntHandItem(10, 10, 2));
         }
-
+        
+        private void Update()
+        {
+            _antProfessionLogic.HandleUpdate(Time.deltaTime);
+            
+            foreach (var abilite in _abilites)
+            {
+                abilite.OnUpdate(Time.deltaTime);
+            }
+            
+            if(Input.GetKeyDown(KeyCode.A)) SwitchProfession(AntProfessionType.Worker, new AntHandItem(10, 10, 2));
+            if(Input.GetKeyDown(KeyCode.S)) SwitchProfession(AntProfessionType.MeleeWarrior, new AntHandItem(10, 10, 2));
+            if(Input.GetKeyDown(KeyCode.D)) SwitchProfession(AntProfessionType.RangeWarrior, new AntHandItem(10, 10, 2));
+        }
+        
         public void SwitchProfession(AntProfessionType newProfessionType, AntHandItem antHandItem)
         {
             ProfessionType = newProfessionType;
@@ -24,14 +43,15 @@ namespace Unit.Ants
             {
                 case (AntProfessionType.Worker):
                     UnitType = UnitType.Worker;
+                    _antProfessionLogic = new AntWorkerLogic(transform, visibleZone, _handItem);
                     break;
                 case (AntProfessionType.MeleeWarrior):
                     UnitType = UnitType.AttackUnit;
-                    _attackLogic = new AntMeleeAttackLogic(transform, _visibleZone, _handItem);
+                    _antProfessionLogic = _meleeAttackLogic= new AntMeleeAttackLogic(transform, visibleZone, _handItem);
                     break;
                 case (AntProfessionType.RangeWarrior):
                     UnitType = UnitType.AttackUnit;
-                    _attackLogic = new AntRangeAttackLogic(transform, _visibleZone, _handItem);
+                    _antProfessionLogic = _rangeAttackLogic = new AntRangeAttackLogic(transform, visibleZone, _handItem);
                     break;
                 default: throw new NotImplementedException();
             }
@@ -39,21 +59,15 @@ namespace Unit.Ants
 
         public override void GiveOrder(GameObject target, Vector3 position)
         {
-            if(target.TryCast(out IUnitTarget unitTarget))
-                switch (UnitType)
-                {
-                    case (UnitType.Worker):
-                        _workerLogic.GiveOrder(unitTarget);
-                        SetDestination(target.transform.position);
-                        break;
-                }
+            Debug.Log("Ant " + target);
 
-            // if (UnitType == UnitType.Worker && target.TryCast(out IUnitTarget unitTarget))
-            //     _workerLogic.GiveOrder(unitTarget, position);
-        }
-
-        public void GiveMoveOrder(Vector3 position)
-        {
+            if (target.TryGetComponent(out IUnitTarget unitTarget))
+                _antProfessionLogic.GiveOrder(unitTarget);
+            else
+            {
+                _antProfessionLogic.GiveOrder(null);
+            }
+            
             SetDestination(position);
         }
     }

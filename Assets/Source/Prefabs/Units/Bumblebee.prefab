@@ -271,12 +271,12 @@ MonoBehaviour:
     reloadTimer:
       _currentValue: 0
       _capacity: 0
-    abilityIcon: {fileID: 0}
+    abilityIcon: {fileID: 21300000, guid: 2fd7fc339913f5a49a5fcd333cd94e97, type: 3}
   _ability2:
     reloadTimer:
       _currentValue: 0
       _capacity: 0
-    abilityIcon: {fileID: 0}
+    abilityIcon: {fileID: 21300000, guid: 763620d23207e5442b18d34333491558, type: 3}
 --- !u!1 &6598553407153258799
 GameObject:
   m_ObjectHideFlags: 0
@@ -425,7 +425,7 @@ PrefabInstance:
     - target: {fileID: 7877576704086922750, guid: 2d70e5685dae19548a058ab1382c8671, type: 3}
       propertyPath: selectable
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 781025887097297528}
     - target: {fileID: 7877576704086922750, guid: 2d70e5685dae19548a058ab1382c8671, type: 3}
       propertyPath: selectableObject
       value: 
