@@ -1,35 +1,33 @@
 ﻿using System;
 using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Object = UnityEngine.Object;
 
 [Serializable]
 public abstract class LogicBlockBase
 {
-    [field: SerializeField]protected  Transform Transform;
-    [field: SerializeField]protected  UnitVisibleZone VisibleZone;
-    [field: SerializeField]protected  float ReactionDistance;
-    [field: SerializeField]protected  ResourceStorage Cooldown;
+    protected readonly Transform Transform;
+    protected readonly UnitVisibleZone VisibleZone;
+    protected readonly float Range;
 
     [CanBeNull] protected IUnitTarget Target;
     
-    protected LogicBlockBase(Transform transform, UnitVisibleZone unitVisibleZone, float reactionDistance, float cooldown)
+    protected LogicBlockBase(Transform transform, UnitVisibleZone unitVisibleZone, float range)
     {
         Transform = transform;
         VisibleZone = unitVisibleZone;
-        ReactionDistance = reactionDistance;
-        Cooldown = new ResourceStorage(cooldown,cooldown);
+        Range = range;
 
         VisibleZone.EnterEvent += OnEnterTargetInVisibleZone;
         VisibleZone.ExitEvent += OnExitTargetInVisibleZone;
     }
     
-    protected LogicBlockBase(Transform transform, UnitVisibleZone unitVisibleZone, float reactionDistance, float cooldown, IUnitTarget target)
+    protected LogicBlockBase(Transform transform, UnitVisibleZone unitVisibleZone, float range, IUnitTarget target)
     {
         Transform = transform;
         VisibleZone = unitVisibleZone;
-        ReactionDistance = reactionDistance;
-        Cooldown = new ResourceStorage(cooldown,cooldown);
+        Range = range;
         Target = target;
 
         VisibleZone.EnterEvent += OnEnterTargetInVisibleZone;
@@ -38,11 +36,7 @@ public abstract class LogicBlockBase
     
     
     /// <returns> return distance between Transform and someTarget</returns>
-    protected float Distance(IUnitTarget someTarget) 
-        => 
-            Vector3.Distance(
-                Transform.position, 
-                someTarget.Transform.position);
+    protected float Distance(IUnitTarget someTarget) => Vector3.Distance(Transform.position, someTarget.Transform.position);
     
     protected abstract void OnEnterTargetInVisibleZone(IUnitTarget target);
     protected abstract void OnExitTargetInVisibleZone(IUnitTarget target);
@@ -53,11 +47,15 @@ public abstract class LogicBlockBase
     /// Set target for unit
     /// </summary>
     /// <param name="newTarget"></param>
-    /// <returns> return true, if distance for a target less then distance reaction, else return false </returns>
-    public virtual bool GiveOrder(IUnitTarget newTarget)
+    /// <param name="defaultPosition"></param>
+    /// <returns> return current position, if distance for a target less or equal to range, else return target position. If target is null or invalid return default position </returns>
+    // /// <returns> return true, if distance for a target less then distance reaction, else return false. If target is null return false </returns>
+    public virtual Vector3 GiveOrder(IUnitTarget newTarget, Vector3 defaultPosition)
     {
         Target = newTarget;
-        return CheckOnNullAndUnityNull(Target) || (Distance(Target) <= ReactionDistance);
+        if (CheckOnNullAndUnityNull(Target)) return defaultPosition;
+        if (Distance(Target) <= Range) return Transform.position;
+        return newTarget.Transform.position;
     }
     
     protected bool CheckOnNullAndUnityNull<T>(T t) => t == null || ((t is Object) && (t as Object) == null);

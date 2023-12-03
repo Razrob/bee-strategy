@@ -1,18 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
 public class WorkerLogic : LogicBlockBase
 {
-    private readonly Gathering _gathering;
+    private readonly ResourceExtraction _resourceExtraction;
     private readonly BuildConstruction _buildConstruction;
+    
     private bool _targetInTheRange;
     
-    public WorkerLogic(Transform transform, UnitVisibleZone visibleZone, float reactionDistance, float cooldown, int gatheringCapacity)
-        : base(transform, visibleZone, reactionDistance, cooldown)
+    public event Action OnExtractionEnd;
+    public event Action OnStorageResource;
+    
+    public WorkerLogic(Transform transform, UnitVisibleZone visibleZone, float reactionDistance,  int gatheringCapacity, float gatheringSpeed)
+        : base(transform, visibleZone, reactionDistance)
     {
-        _gathering = new Gathering(transform, gatheringCapacity, cooldown);
+        _resourceExtraction = new ResourceExtraction(gatheringCapacity, gatheringSpeed);
         _buildConstruction = new BuildConstruction();
         _targetInTheRange = false;
+
+        _resourceExtraction.OnExtractionEnd += OnExtractionEndMethod;
+        _resourceExtraction.OnStorageResource += OnStorageResourceMethod;
     }
 
     protected override void OnEnterTargetInVisibleZone(IUnitTarget target) { }
@@ -22,7 +29,7 @@ public class WorkerLogic : LogicBlockBase
         if(CheckOnNullAndUnityNull(Target)) return;
         if(Target != target) return;
         
-        _gathering.OnTargetExit();
+        _resourceExtraction.OnTargetExit();
         _buildConstruction.OnTargetExit(target);
     }
     
@@ -30,11 +37,11 @@ public class WorkerLogic : LogicBlockBase
     {
         if(CheckOnNullAndUnityNull(Target)) return;
         
-        if (Distance(Target) <= ReactionDistance)
+        if (Distance(Target) <= Range)
         {
             if (!_targetInTheRange)
             {
-                _gathering.OnTargetEnter();
+                _resourceExtraction.OnTargetEnter();
                 _buildConstruction.OnTargetEnter(Target);
                 _targetInTheRange = true;
             }
@@ -43,7 +50,7 @@ public class WorkerLogic : LogicBlockBase
         {
             if (_targetInTheRange)
             {
-                _gathering.OnTargetExit();
+                _resourceExtraction.OnTargetExit();
                 _buildConstruction.OnTargetExit(Target);
                 _targetInTheRange = false;
             }
@@ -52,67 +59,71 @@ public class WorkerLogic : LogicBlockBase
 
         if (_targetInTheRange)
         {
-            _gathering.OnTargetStay();
+            _resourceExtraction.OnTargetStay();
             _buildConstruction.OnTargetStay();
         }
     }
 
     
-    public override bool GiveOrder(IUnitTarget newTarget)
+    public override Vector3 GiveOrder(IUnitTarget newTarget, Vector3 defaultPosition)
     {
         Debug.Log($"logic {newTarget}");
         Target = newTarget;
         if (CheckOnNullAndUnityNull(Target))
         {
-            _gathering.GiveOrder(null);
+            _resourceExtraction.GiveOrder(null);
             _buildConstruction.GiveOrder(null);
-            return false;
+            return defaultPosition;
         }
         
         switch (newTarget.TargetType)
         {
             case UnitTargetType.ResourceSource:
-                _gathering.GiveOrder(Target);
+                _resourceExtraction.GiveOrder(Target);
                 _buildConstruction.GiveOrder(null);
                 break;
             case UnitTargetType.Construction:
-                _gathering.GiveOrder(Target);
+                _resourceExtraction.GiveOrder(Target);
                 _buildConstruction.GiveOrder(Target);
                 break;
             default:
-                _gathering.GiveOrder(null);
+                _resourceExtraction.GiveOrder(null);
                 _buildConstruction.GiveOrder(null);
-                return false;
+                return defaultPosition;
         }
 
-        if (!VisibleZone.Contains(Target)) return false;
-        if (Distance(Target) > ReactionDistance) return false;
+        if (!VisibleZone.Contains(Target)) return Target.Transform.position;
+        if (Distance(Target) > Range) return Target.Transform.position;
 
-        _gathering.OnTargetEnter();
+        _resourceExtraction.OnTargetEnter();
         _buildConstruction.OnTargetEnter(Target);
-        return true;
+        return Transform.position;
     }
 
-    private class Gathering
+    private void OnExtractionEndMethod() => OnExtractionEnd?.Invoke();
+    private void OnStorageResourceMethod() => OnStorageResource?.Invoke();
+    
+    private class ResourceExtraction
     {
-        private readonly Transform _resourceSkin;
-        private readonly int _gatheringCapacity;
-        private readonly float _gatheringTIme;
-
+        private readonly int _extractionCapacity;
+        private readonly float _extractionTIme;
+        
         private IUnitTarget _target;
         
-        public float GatherTimer { get; private set; } 
-        public bool IsGathering { get; private set; }
+        public float ExtractionTimer { get; private set; } 
+        public bool Extracting { get; private set; }
         public bool GotResource { get; private set; }
 
-        public Gathering(Transform unit, int gatheringCapacity, float gatheringTIme)
+        public event Action OnExtractionEnd;
+        public event Action OnStorageResource;
+        
+        public ResourceExtraction(int extractionCapacity, float extractionTIme)
         {
-            _resourceSkin = unit.GetChild(1);
-            _gatheringCapacity = gatheringCapacity;
-            _gatheringTIme = gatheringTIme;
+            _extractionCapacity = extractionCapacity;
+            _extractionTIme = extractionTIme;
 
-            GatherTimer = 0;
-            IsGathering = GotResource = false;
+            ExtractionTimer = 0;
+            Extracting = GotResource = false;
         }
 
         public void GiveOrder(IUnitTarget newTarget)
@@ -124,8 +135,8 @@ public class WorkerLogic : LogicBlockBase
                 return;
             }
 
-            GatherTimer = 0;
-            IsGathering = false;
+            ExtractionTimer = 0;
+            Extracting = false;
             switch (newTarget.TargetType)
             {
                 case UnitTargetType.ResourceSource:
@@ -156,16 +167,16 @@ public class WorkerLogic : LogicBlockBase
                         return;
                     if(GotResource) 
                         return;
-                    IsGathering = true;
+                    Extracting = true;
                     break;
                 case UnitTargetType.Construction:
                     if (!GotResource) 
                         return;
                     if (!_target.CastPossible<TownHall>()) 
                         return;
-                    ResourceGlobalStorage.ChangeValue(ResourceID.Pollen, _gatheringCapacity);
-                    _resourceSkin.transform.gameObject.SetActive(false);
-                    IsGathering = false;
+                    ResourceGlobalStorage.ChangeValue(ResourceID.Pollen, _extractionCapacity);
+                    OnStorageResource?.Invoke();
+                    Extracting = false;
                     GotResource = false;
                     break;
                 default: return;
@@ -176,8 +187,8 @@ public class WorkerLogic : LogicBlockBase
         {
             if(_target == null) return;
             
-            IsGathering = false;
-            GatherTimer = 0;
+            Extracting = false;
+            ExtractionTimer = 0;
         }
 
         public void OnTargetStay()
@@ -187,22 +198,22 @@ public class WorkerLogic : LogicBlockBase
             switch (_target.TargetType)
             {
                 case UnitTargetType.ResourceSource:
-                    if (!IsGathering) return;
+                    if (!Extracting) return;
                     if (GotResource) return;
                     
-                    GatherTimer += Time.deltaTime;
-                    if (GatherTimer > _gatheringTIme)
+                    ExtractionTimer += Time.deltaTime;
+                    if (ExtractionTimer > _extractionTIme)
                     {
-                        GatherTimer = 0;
-                        IsGathering = false;
+                        ExtractionTimer = 0;
+                        Extracting = false;
                         
                         if (_target.TryCast(out PollenStorage pollenStorage))
                         {
-                            pollenStorage.ExtractPollen(_gatheringCapacity);
+                            pollenStorage.ExtractPollen(_extractionCapacity);
                             
                             Debug.Log("SetActive");
-                            _resourceSkin.transform.gameObject.SetActive(true);
                             GotResource = true;
+                            OnExtractionEnd?.Invoke();
                         }
                     }
                     break;
@@ -212,8 +223,9 @@ public class WorkerLogic : LogicBlockBase
                         return;
                     if (!_target.CastPossible<TownHall>()) 
                         return;
-                    ResourceGlobalStorage.ChangeValue(ResourceID.Pollen, _gatheringCapacity);
-                    _resourceSkin.transform.gameObject.SetActive(false);
+                    ResourceGlobalStorage.ChangeValue(ResourceID.Pollen, _extractionCapacity);
+                    OnStorageResource?.Invoke();
+                    Extracting = false;
                     GotResource = false;
                     break;
                 
@@ -227,7 +239,8 @@ public class WorkerLogic : LogicBlockBase
         public bool IsFindingBuild { get; private set; }
         public bool IsBuilding { get; private set; }
         private Vector3 _destination;
-        // private IUnitTarget _target;
+        private IUnitTarget _target;
+        private BuildingProgressConstruction _buildTarget;
         
         public BuildConstruction()
         {
@@ -236,19 +249,26 @@ public class WorkerLogic : LogicBlockBase
 
         public void OnTargetEnter(IUnitTarget unitTarget)
         {
-            switch (unitTarget.TargetType)
-            {
-                case UnitTargetType.Construction:
-                     if (!unitTarget.TryCast(out BuildingProgressConstruction progressConstruction))
-                         return;
-                    
-                     Debug.Log("constuct");
-                     IsBuilding = true;
-                     IsFindingBuild = false;
-                     progressConstruction.WorkerArrived = true;
-                    break;
-                default: return;
-            }
+            // if(_target != unitTarget) return;
+            //
+            // switch (unitTarget.TargetType)
+            // {
+            //     case UnitTargetType.Construction:
+            //          if (!unitTarget.TryCast(out BuildingProgressConstruction progressConstruction))
+            //              return;
+            //         
+            //          Debug.Log("construct");
+            //          IsBuilding = true;
+            //          IsFindingBuild = false;
+            //          progressConstruction.WorkerArrived = true;
+            //         break;
+            //     default: return;
+            // }
+            
+            Debug.Log("construct");
+            IsBuilding = true;
+            IsFindingBuild = false;
+            _buildTarget.WorkerArrived = true;
         }
 
         public void OnTargetExit(IUnitTarget unitTarget)
@@ -256,7 +276,7 @@ public class WorkerLogic : LogicBlockBase
             if (unitTarget.TargetType != UnitTargetType.Construction ||
                 !unitTarget.TryCast(out BuildingProgressConstruction progressConstruction)) return;
             
-            Debug.Log("Un constuct");
+            Debug.Log("Un construct");
             progressConstruction.WorkerArrived = false;
             IsBuilding = false;
             IsFindingBuild = false;
@@ -271,7 +291,11 @@ public class WorkerLogic : LogicBlockBase
         //TODO: rework OnTargetStay and next rework GiveOrder
         public void GiveOrder(IUnitTarget newTarget)
         {
+            if(newTarget == null) return ;
+            if(!newTarget.TryCast(out BuildingProgressConstruction progressConstruction)) return;
             
+            _target = newTarget;
+            _buildTarget = progressConstruction;
         }    
     }
 }

@@ -1,9 +1,15 @@
+using UnityEngine;
+using UnityEngine.Serialization;
+
 namespace Unit.Ants
 {
     public class AntUnit : MovingUnit
     {
         public override AffiliationEnum Affiliation => AffiliationEnum.Ants;
-        public AntProfessionType ProfessionType { get; protected set; } = AntProfessionType.Worker;
-        public UnitType UnitType { get; protected set; } = UnitType.Worker;
+        
+        [SerializeField] protected AntProfessionConfigBase ProfessionConfig;
+
+        public AntProfessionType ProfessionType => ProfessionConfig.Profession;
+        public UnitType UnitType => ProfessionConfig.UnitType; 
     }
 }

@@ -198,7 +198,7 @@ GameObject:
   - component: {fileID: 3147600091928220558}
   - component: {fileID: 763440142496869530}
   m_Layer: 11
-  m_Name: AntWorker
+  m_Name: Ant
   m_TagString: Unit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -297,8 +297,12 @@ MonoBehaviour:
       _currentValue: 0
       _capacity: 10
     abilityIcon: {fileID: 21300000, guid: 763620d23207e5442b18d34333491558, type: 3}
-  startProfession: 10
+  HandItem: {fileID: 11400000, guid: 2d5f03323772ea640bb597a770c1a7cd, type: 2}
   visibleZone: {fileID: 4950172718863868761}
+  resource: {fileID: 556127432556933653}
+  worker: {fileID: 11400000, guid: 2d5f03323772ea640bb597a770c1a7cd, type: 2}
+  melee: {fileID: 11400000, guid: a1ffb12e1c656624395609ff1d59c9aa, type: 2}
+  range: {fileID: 11400000, guid: fb0467aa8bb2ef04eab3b65dcadc0e09, type: 2}
 --- !u!1 &5598300324912119502
 GameObject:
   m_ObjectHideFlags: 0

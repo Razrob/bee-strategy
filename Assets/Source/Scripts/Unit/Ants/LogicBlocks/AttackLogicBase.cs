@@ -6,18 +6,29 @@ using UnityEngine;
 public abstract class AttackLogicBase : LogicBlockBase, IDamageApplicator
 {
     protected readonly Dictionary<IUnitTarget, IDamagable> DamageableTargetsInVisibleZone = new Dictionary<IUnitTarget, IDamagable>();
+    protected readonly AffiliationEnum Affiliation;
     
+    protected ResourceStorage Cooldown;
+
     public float Damage { get; }
 
-    protected AttackLogicBase(Transform transform, UnitVisibleZone visibleZone, float attackDistance, float attackCooldown, float damage)
-        : base(transform, visibleZone, attackDistance, attackCooldown)
+    protected AttackLogicBase(Transform transform, UnitVisibleZone visibleZone, float attackDistance,
+        AffiliationEnum affiliation, float attackCooldown, float damage)
+        : base(transform, visibleZone, attackDistance)
     {
+        Affiliation = affiliation;
+        Cooldown = new ResourceStorage(attackCooldown, attackCooldown);
         Damage = damage;
+
+        foreach (var target in visibleZone.ContainsComponents)
+            OnEnterTargetInVisibleZone(target);
     }
     
-    protected override void OnEnterTargetInVisibleZone(IUnitTarget target)
+    protected sealed override void OnEnterTargetInVisibleZone(IUnitTarget target)
     {
         if (!target.TryCast(out IDamagable damageable)) return;
+        if (!target.TryCast(out IAffiliation targetAffiliation)) return;
+        if (targetAffiliation.Affiliation == Affiliation) return;
         if (DamageableTargetsInVisibleZone.ContainsKey(target)) return;
         
         DamageableTargetsInVisibleZone.Add(target, damageable);
@@ -52,13 +63,18 @@ public abstract class AttackLogicBase : LogicBlockBase, IDamageApplicator
         Cooldown.SetValue(timeBuffer);
     }
 
-    public override bool GiveOrder(IUnitTarget newTarget)
+    public override Vector3 GiveOrder(IUnitTarget newTarget, Vector3 defaultPosition)
     {
-        if (CheckOnNullAndUnityNull(newTarget)) return false;
-        if (!newTarget.CastPossible<IDamagable>()) return false;
-        if (!DamageableTargetsInVisibleZone.ContainsKey(newTarget)) return false;
+        if (CheckOnNullAndUnityNull(newTarget)) return defaultPosition;
+        if (!newTarget.CastPossible<IDamagable>()) return defaultPosition;
+        if (!newTarget.TryCast(out IAffiliation targetAffiliation)) return defaultPosition;
+        if (targetAffiliation.Affiliation == Affiliation) return defaultPosition;
+        if (!DamageableTargetsInVisibleZone.ContainsKey(newTarget)) return defaultPosition;
+        if (Distance(newTarget) > Range) return newTarget.Transform.position;
+
+        Target = newTarget;
         
-        return true;
+        return Transform.position;
     }
 
     protected bool TryGetNearestDamageableTarget(out IUnitTarget nearestTarget)
@@ -69,7 +85,7 @@ public abstract class AttackLogicBase : LogicBlockBase, IDamageApplicator
         foreach (var target in DamageableTargetsInVisibleZone)
         {
             float distance = Distance(target.Key);
-            if (distance <= ReactionDistance && distance < currentDistance)
+            if (distance <= Range && distance < currentDistance)
             {
                 nearestTarget = target.Key;
                 currentDistance = distance;
