@@ -15,14 +15,7 @@ MonoBehaviour:
   <AnimatorController>k__BackingField: {fileID: 0}
   <UnitType>k__BackingField: 0
   <Range>k__BackingField: 8
-  <antsAccess>k__BackingField:
-    _cells:
-    - Key: 0
-      Value: 1
-    - Key: 10
-      Value: 1
-    - Key: 20
-      Value: 1
+  <antsAccess>k__BackingField: 000000000a00000014000000
   <Damage>k__BackingField: 5
   <Cooldown>k__BackingField: 2
   <ProjectilePrefab>k__BackingField: {fileID: 7314894331738045515, guid: 845ad4e064a470e478bdf744e08367d5, type: 3}
