@@ -4,10 +4,11 @@ using UnityEngine;
 [Serializable]
 public class MeleeAttackLogic : AttackLogicBase
 {
-    public MeleeAttackLogic(Transform transform, UnitVisibleZone visibleZone, float attackDistance, AffiliationEnum affiliation, float damage, float attackCooldown)
-        : base(transform, visibleZone, attackDistance, affiliation, attackCooldown, damage) { }
+    public MeleeAttackLogic(Transform transform, UnitVisibleZone visibleZone, float attackDistance,
+        AffiliationEnum affiliation, float damage, float attackCooldown, UnitBase unit)
+        : base(transform, attackDistance, visibleZone, affiliation, attackCooldown, damage, unit) { }
 
-    protected override void TryAttack(IUnitTarget target)
+    protected override void Attack(IUnitTarget target)
     {
         if (Distance(target) > Range) return;
         if(!DamageableTargetsInVisibleZone.ContainsKey(target)) return;   

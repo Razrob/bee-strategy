@@ -196,7 +196,7 @@ GameObject:
   - component: {fileID: 4893021366675086554}
   - component: {fileID: 5000668780768274778}
   - component: {fileID: 3147600091928220558}
-  - component: {fileID: 763440142496869530}
+  - component: {fileID: 5284556216630701785}
   m_Layer: 11
   m_Name: Ant
   m_TagString: Unit
@@ -273,7 +273,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &763440142496869530
+--- !u!114 &5284556216630701785
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -282,27 +282,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 3076308753430282793}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 69e7bff03f654b5a9ac4bcc250194358, type: 3}
+  m_Script: {fileID: 11500000, guid: f29b5ba9e2b54fd29e04b27f0c1238d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _unitVisibleZone: {fileID: 4950172718863868761}
   _navMeshAgent: {fileID: 4893021366675086554}
   _ability1:
     reloadTimer:
-      _currentValue: 0
-      _capacity: 5
+      _currentValue: 2
+      _capacity: 2
     abilityIcon: {fileID: 21300000, guid: 2fd7fc339913f5a49a5fcd333cd94e97, type: 3}
   _ability2:
     reloadTimer:
-      _currentValue: 0
-      _capacity: 10
+      _currentValue: 5
+      _capacity: 5
     abilityIcon: {fileID: 21300000, guid: 763620d23207e5442b18d34333491558, type: 3}
-  HandItem: {fileID: 11400000, guid: 2d5f03323772ea640bb597a770c1a7cd, type: 2}
-  visibleZone: {fileID: 4950172718863868761}
+  DefaultProfessionConfig: {fileID: 11400000, guid: 2d5f03323772ea640bb597a770c1a7cd, type: 2}
   resource: {fileID: 556127432556933653}
-  worker: {fileID: 11400000, guid: 2d5f03323772ea640bb597a770c1a7cd, type: 2}
-  melee: {fileID: 11400000, guid: a1ffb12e1c656624395609ff1d59c9aa, type: 2}
-  range: {fileID: 11400000, guid: fb0467aa8bb2ef04eab3b65dcadc0e09, type: 2}
+  CurrentState: 0
 --- !u!1 &5598300324912119502
 GameObject:
   m_ObjectHideFlags: 0
@@ -451,7 +448,7 @@ PrefabInstance:
     - target: {fileID: 7877576704086922750, guid: 2d70e5685dae19548a058ab1382c8671, type: 3}
       propertyPath: selectable
       value: 
-      objectReference: {fileID: 763440142496869530}
+      objectReference: {fileID: 5284556216630701785}
     - target: {fileID: 7877576704086922750, guid: 2d70e5685dae19548a058ab1382c8671, type: 3}
       propertyPath: selectableObject
       value: 

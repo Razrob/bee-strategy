@@ -99,7 +99,7 @@ public class WorkerDuty : MonoBehaviour
                 isFindingRes = false;
                 isGathering = false;
 
-                collider.transform.parent.GetComponent<PollenStorage>().ExtractPollen(loadCapacity);
+                collider.transform.parent.GetComponent<PollenStorage>().ExtractResource(loadCapacity);
 
                 
                 GameObject Base = GameObject.Find("TownHall");

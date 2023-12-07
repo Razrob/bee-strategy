@@ -3,299 +3,69 @@ using UnityEngine;
 
 public class WorkerLogic : LogicBlockBase
 {
-    private readonly ResourceExtraction _resourceExtraction;
-    private readonly BuildConstruction _buildConstruction;
+    public int ExtractionCapacity  { get; private set; }
+    public ResourceID ExtractedResourceID { get; private set; }
+    public bool GotResource { get; private set; }
     
-    private bool _targetInTheRange;
+    public event Action OnResourceExtracted;
+    public event Action OnResourcesStoraged;
     
-    public event Action OnExtractionEnd;
-    public event Action OnStorageResource;
-    
-    public WorkerLogic(Transform transform, UnitVisibleZone visibleZone, float reactionDistance,  int gatheringCapacity, float gatheringSpeed)
-        : base(transform, visibleZone, reactionDistance)
+    public WorkerLogic(Transform transform, float range,  int gatheringCapacity, float gatheringSpeed)
+        : base(transform, range)
     {
-        _resourceExtraction = new ResourceExtraction(gatheringCapacity, gatheringSpeed);
-        _buildConstruction = new BuildConstruction();
-        _targetInTheRange = false;
-
-        _resourceExtraction.OnExtractionEnd += OnExtractionEndMethod;
-        _resourceExtraction.OnStorageResource += OnStorageResourceMethod;
+        ExtractionCapacity = gatheringCapacity;
     }
 
-    protected override void OnEnterTargetInVisibleZone(IUnitTarget target) { }
-
-    protected override void OnExitTargetInVisibleZone(IUnitTarget target)
+    public void ResourceExtracted(ResourceID resourceID)
     {
-        if(CheckOnNullAndUnityNull(Target)) return;
-        if(Target != target) return;
+        ExtractedResourceID = resourceID;
+        GotResource = true;
         
-        _resourceExtraction.OnTargetExit();
-        _buildConstruction.OnTargetExit(target);
-    }
-    
-    public override void HandleUpdate(float time)
-    {
-        if(CheckOnNullAndUnityNull(Target)) return;
-        
-        if (Distance(Target) <= Range)
-        {
-            if (!_targetInTheRange)
-            {
-                _resourceExtraction.OnTargetEnter();
-                _buildConstruction.OnTargetEnter(Target);
-                _targetInTheRange = true;
-            }
-        }
-        else
-        {
-            if (_targetInTheRange)
-            {
-                _resourceExtraction.OnTargetExit();
-                _buildConstruction.OnTargetExit(Target);
-                _targetInTheRange = false;
-            }
-            return;
-        }
-
-        if (_targetInTheRange)
-        {
-            _resourceExtraction.OnTargetStay();
-            _buildConstruction.OnTargetStay();
-        }
+        OnResourceExtracted?.Invoke();
     }
 
-    
-    public override Vector3 GiveOrder(IUnitTarget newTarget, Vector3 defaultPosition)
+    public void ResourcesStoraged()
     {
-        Debug.Log($"logic {newTarget}");
-        Target = newTarget;
-        if (CheckOnNullAndUnityNull(Target))
-        {
-            _resourceExtraction.GiveOrder(null);
-            _buildConstruction.GiveOrder(null);
+        GotResource = false;
+        OnResourcesStoraged?.Invoke();
+    }
+    
+    public override Vector3 GiveOrder(IUnitTarget target, Vector3 defaultPosition)
+    {
+        if (target.CheckOnNullAndUnityNull())
             return defaultPosition;
-        }
-        
-        switch (newTarget.TargetType)
-        {
-            case UnitTargetType.ResourceSource:
-                _resourceExtraction.GiveOrder(Target);
-                _buildConstruction.GiveOrder(null);
-                break;
-            case UnitTargetType.Construction:
-                _resourceExtraction.GiveOrder(Target);
-                _buildConstruction.GiveOrder(Target);
-                break;
-            default:
-                _resourceExtraction.GiveOrder(null);
-                _buildConstruction.GiveOrder(null);
-                return defaultPosition;
-        }
 
-        if (!VisibleZone.Contains(Target)) return Target.Transform.position;
-        if (Distance(Target) > Range) return Target.Transform.position;
+        if (target.TargetType != UnitTargetType.ResourceSource ||
+            target.TargetType != UnitTargetType.Construction)
+            return defaultPosition;
 
-        _resourceExtraction.OnTargetEnter();
-        _buildConstruction.OnTargetEnter(Target);
+        if (Distance(target) > Range) 
+            return target.Transform.position;
+
         return Transform.position;
     }
-
-    private void OnExtractionEndMethod() => OnExtractionEnd?.Invoke();
-    private void OnStorageResourceMethod() => OnStorageResource?.Invoke();
     
-    private class ResourceExtraction
+    public override UnitPathData TakePathData(IUnitTarget unitTarget)
     {
-        private readonly int _extractionCapacity;
-        private readonly float _extractionTIme;
-        
-        private IUnitTarget _target;
-        
-        public float ExtractionTimer { get; private set; } 
-        public bool Extracting { get; private set; }
-        public bool GotResource { get; private set; }
+        if(unitTarget.CheckOnNullAndUnityNull())
+            return new UnitPathData(null, UnitTargetType.None, UnitPathType.Move);
 
-        public event Action OnExtractionEnd;
-        public event Action OnStorageResource;
-        
-        public ResourceExtraction(int extractionCapacity, float extractionTIme)
+        switch (unitTarget.TargetType)
         {
-            _extractionCapacity = extractionCapacity;
-            _extractionTIme = extractionTIme;
-
-            ExtractionTimer = 0;
-            Extracting = GotResource = false;
-        }
-
-        public void GiveOrder(IUnitTarget newTarget)
-        {
-            Debug.Log($"gathering {newTarget}");
-            if (newTarget == null)
-            {
-                _target = null;
-                return;
-            }
-
-            ExtractionTimer = 0;
-            Extracting = false;
-            switch (newTarget.TargetType)
-            {
-                case UnitTargetType.ResourceSource:
-                    if (newTarget.CastPossible<PollenStorage>())
-                        _target = newTarget;
-                    else
-                        _target = null;
-                    break;
-                case UnitTargetType.Construction:
-                    if (GotResource && newTarget.CastPossible<TownHall>()) 
-                        _target = newTarget;
-                    else
-                        _target = null;
-                    break;
-                default: return;
-            }
-            Debug.Log($"gathering2 {_target}");
-        }    
-
-        public void OnTargetEnter()
-        { 
-            if(_target == null) return;
-            
-            switch (_target.TargetType)
-            {
-                case UnitTargetType.ResourceSource:
-                    if (!_target.CastPossible<PollenStorage>()) 
-                        return;
-                    if(GotResource) 
-                        return;
-                    Extracting = true;
-                    break;
-                case UnitTargetType.Construction:
-                    if (!GotResource) 
-                        return;
-                    if (!_target.CastPossible<TownHall>()) 
-                        return;
-                    ResourceGlobalStorage.ChangeValue(ResourceID.Pollen, _extractionCapacity);
-                    OnStorageResource?.Invoke();
-                    Extracting = false;
-                    GotResource = false;
-                    break;
-                default: return;
-            }
-        }
-
-        public void OnTargetExit()
-        {
-            if(_target == null) return;
-            
-            Extracting = false;
-            ExtractionTimer = 0;
-        }
-
-        public void OnTargetStay()
-        {
-            if (_target == null) return;
-
-            switch (_target.TargetType)
-            {
-                case UnitTargetType.ResourceSource:
-                    if (!Extracting) return;
-                    if (GotResource) return;
-                    
-                    ExtractionTimer += Time.deltaTime;
-                    if (ExtractionTimer > _extractionTIme)
-                    {
-                        ExtractionTimer = 0;
-                        Extracting = false;
-                        
-                        if (_target.TryCast(out PollenStorage pollenStorage))
-                        {
-                            pollenStorage.ExtractPollen(_extractionCapacity);
-                            
-                            Debug.Log("SetActive");
-                            GotResource = true;
-                            OnExtractionEnd?.Invoke();
-                        }
-                    }
-                    break;
+            case (UnitTargetType.ResourceSource):
+                return GotResource
+                    ? new UnitPathData(unitTarget, UnitTargetType.Construction, UnitPathType.Storage_Resource)
+                    : new UnitPathData(unitTarget, UnitTargetType.ResourceSource, UnitPathType.Collect_Resource);
+            case (UnitTargetType.Construction):
+                if (unitTarget.CastPossible<BuildingProgressConstruction>())
+                    return new UnitPathData(unitTarget, UnitTargetType.Construction, UnitPathType.Build_Construction);
                 
-                case UnitTargetType.Construction:
-                    if (!GotResource) 
-                        return;
-                    if (!_target.CastPossible<TownHall>()) 
-                        return;
-                    ResourceGlobalStorage.ChangeValue(ResourceID.Pollen, _extractionCapacity);
-                    OnStorageResource?.Invoke();
-                    Extracting = false;
-                    GotResource = false;
-                    break;
+                if (unitTarget.CastPossible<TownHall>() && GotResource)
+                    return new UnitPathData(unitTarget, UnitTargetType.Construction, UnitPathType.Storage_Resource);  
                 
-                default: return;
-            }
-        }
-    }
-
-    private class BuildConstruction
-    {
-        public bool IsFindingBuild { get; private set; }
-        public bool IsBuilding { get; private set; }
-        private Vector3 _destination;
-        private IUnitTarget _target;
-        private BuildingProgressConstruction _buildTarget;
-        
-        public BuildConstruction()
-        {
-            IsFindingBuild = IsBuilding = false;
-        }
-
-        public void OnTargetEnter(IUnitTarget unitTarget)
-        {
-            // if(_target != unitTarget) return;
-            //
-            // switch (unitTarget.TargetType)
-            // {
-            //     case UnitTargetType.Construction:
-            //          if (!unitTarget.TryCast(out BuildingProgressConstruction progressConstruction))
-            //              return;
-            //         
-            //          Debug.Log("construct");
-            //          IsBuilding = true;
-            //          IsFindingBuild = false;
-            //          progressConstruction.WorkerArrived = true;
-            //         break;
-            //     default: return;
-            // }
-            
-            Debug.Log("construct");
-            IsBuilding = true;
-            IsFindingBuild = false;
-            _buildTarget.WorkerArrived = true;
-        }
-
-        public void OnTargetExit(IUnitTarget unitTarget)
-        {
-            if (unitTarget.TargetType != UnitTargetType.Construction ||
-                !unitTarget.TryCast(out BuildingProgressConstruction progressConstruction)) return;
-            
-            Debug.Log("Un construct");
-            progressConstruction.WorkerArrived = false;
-            IsBuilding = false;
-            IsFindingBuild = false;
-        }
-
-        //TODO: update construction building progress in the unit logic, at the moment this logic on the construction side
-        public void OnTargetStay()
-        {
-            
-        }
-        
-        //TODO: rework OnTargetStay and next rework GiveOrder
-        public void GiveOrder(IUnitTarget newTarget)
-        {
-            if(newTarget == null) return ;
-            if(!newTarget.TryCast(out BuildingProgressConstruction progressConstruction)) return;
-            
-            _target = newTarget;
-            _buildTarget = progressConstruction;
+                return new UnitPathData(null, UnitTargetType.None, UnitPathType.Move);
+            default: 
+                return new UnitPathData(null, UnitTargetType.None, UnitPathType.Move);
         }    
     }
 }

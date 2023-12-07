@@ -1,31 +1,46 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
 public abstract class AttackLogicBase : LogicBlockBase, IDamageApplicator
 {
-    protected readonly Dictionary<IUnitTarget, IDamagable> DamageableTargetsInVisibleZone = new Dictionary<IUnitTarget, IDamagable>();
+    protected readonly UnitBase Unit;
     protected readonly AffiliationEnum Affiliation;
-    
-    protected ResourceStorage Cooldown;
+    protected readonly UnitVisibleZone VisibleZone;
+    protected readonly Dictionary<IUnitTarget, IDamagable> DamageableTargetsInVisibleZone = 
+        new Dictionary<IUnitTarget, IDamagable>();
 
+    public int EnemiesCount => DamageableTargetsInVisibleZone.Keys.Count;
+    public bool CanAttack { get; private set; }
+    public float CooldownTime { get; set; }
     public float Damage { get; }
 
-    protected AttackLogicBase(Transform transform, UnitVisibleZone visibleZone, float attackDistance,
-        AffiliationEnum affiliation, float attackCooldown, float damage)
-        : base(transform, visibleZone, attackDistance)
+    public event Action OnExitTargetFromAttackZone;
+    public event Action OnCooldownEnd;
+    
+    protected AttackLogicBase(Transform transform, float attackDistance, UnitVisibleZone visibleZone,
+        AffiliationEnum affiliation, float attackCooldown, float damage, UnitBase unit)
+        : base(transform, attackDistance)
     {
+        CanAttack = true;
+        Unit = unit;
         Affiliation = affiliation;
-        Cooldown = new ResourceStorage(attackCooldown, attackCooldown);
+        CooldownTime = attackCooldown;
         Damage = damage;
-
+        
+        VisibleZone = visibleZone;
+        VisibleZone.EnterEvent += OnEnterTargetInVisibleZone;
+        VisibleZone.ExitEvent += OnExitTargetInVisibleZone;
+        
         foreach (var target in visibleZone.ContainsComponents)
             OnEnterTargetInVisibleZone(target);
     }
     
-    protected sealed override void OnEnterTargetInVisibleZone(IUnitTarget target)
+    protected void OnEnterTargetInVisibleZone(IUnitTarget target)
     {
+        if (target.CheckOnNullAndUnityNull()) return;
         if (!target.TryCast(out IDamagable damageable)) return;
         if (!target.TryCast(out IAffiliation targetAffiliation)) return;
         if (targetAffiliation.Affiliation == Affiliation) return;
@@ -34,50 +49,51 @@ public abstract class AttackLogicBase : LogicBlockBase, IDamageApplicator
         DamageableTargetsInVisibleZone.Add(target, damageable);
     }
 
-    protected override void OnExitTargetInVisibleZone(IUnitTarget target)
+    protected void OnExitTargetInVisibleZone(IUnitTarget target)
     {
-        DamageableTargetsInVisibleZone.Remove(target);
+        if(DamageableTargetsInVisibleZone.Remove(target))
+            OnExitTargetFromAttackZone?.Invoke();
     }
-
-    public override void HandleUpdate(float time)
+    
+    /// <returns> return tru if some IDamageable stay in attack zone, else return false</returns>
+    public bool CheckEnemiesInAttackZone()
     {
-        if (!TryGetNearestDamageableTarget(out IUnitTarget nearestTarget))
-        {
-            Cooldown.ChangeValue(time);
-            return;
-        }
+        foreach (var target in DamageableTargetsInVisibleZone.Keys)
+            if (Distance(target) <= Range) return true;
         
-        
-        // if we take lag that take more time that cooldown, so we need attack some times
-        float timeBuffer = Cooldown.CurrentValue + time;
-        while (timeBuffer / Cooldown.Capacity >= 1)
-        {
-            if (!TryGetNearestDamageableTarget(out nearestTarget))
-            {
-                Cooldown.ChangeValue(time);
-                break;
-            }
-            TryAttack(nearestTarget);
-            timeBuffer -= Cooldown.Capacity;   
-        }
-        Cooldown.SetValue(timeBuffer);
+        return false;
     }
-
-    public override Vector3 GiveOrder(IUnitTarget newTarget, Vector3 defaultPosition)
+    
+    public override Vector3 GiveOrder(IUnitTarget target, Vector3 defaultPosition)
     {
-        if (CheckOnNullAndUnityNull(newTarget)) return defaultPosition;
-        if (!newTarget.CastPossible<IDamagable>()) return defaultPosition;
-        if (!newTarget.TryCast(out IAffiliation targetAffiliation)) return defaultPosition;
+        if (target.CheckOnNullAndUnityNull()) return defaultPosition;
+        if (!target.CastPossible<IDamagable>()) return defaultPosition;
+        if (!target.TryCast(out IAffiliation targetAffiliation)) return defaultPosition;
         if (targetAffiliation.Affiliation == Affiliation) return defaultPosition;
-        if (!DamageableTargetsInVisibleZone.ContainsKey(newTarget)) return defaultPosition;
-        if (Distance(newTarget) > Range) return newTarget.Transform.position;
-
-        Target = newTarget;
+        if (!DamageableTargetsInVisibleZone.ContainsKey(target)) return defaultPosition;
+        if (Distance(target) > Range) return target.Transform.position;
         
         return Transform.position;
     }
 
-    protected bool TryGetNearestDamageableTarget(out IUnitTarget nearestTarget)
+    /// <summary>
+    /// Attack target, if target can't be attacked, then attack nearest enemy
+    /// </summary>
+    public void TryAttack(IUnitTarget target)
+    {
+        if(!CanAttack) return;
+        
+        if (!target.CheckOnNullAndUnityNull() && Distance(target) <= Range)
+            Attack(target);
+        else if(TryGetNearestDamageableTarget(out IUnitTarget nearestTarget))
+            Attack(nearestTarget);
+
+        Unit.StartCoroutine(Cooldown(CooldownTime));
+    }
+    
+    protected abstract void Attack(IUnitTarget target);
+    
+    public bool TryGetNearestDamageableTarget(out IUnitTarget nearestTarget)
     {
         nearestTarget = null;
         float currentDistance = float.MaxValue;
@@ -95,5 +111,30 @@ public abstract class AttackLogicBase : LogicBlockBase, IDamageApplicator
         return !(nearestTarget is null);
     }
     
-    protected abstract void TryAttack(IUnitTarget target);
+    public override UnitPathData TakePathData(IUnitTarget unitTarget)
+    {
+        if (unitTarget.CheckOnNullAndUnityNull() ||
+            !unitTarget.CastPossible<IDamagable>() ||
+            !unitTarget.TryCast(out IAffiliation affiliation) ||
+            affiliation.Affiliation == Affiliation)
+            return new UnitPathData(null, UnitTargetType.None, UnitPathType.Move);
+            
+        switch (unitTarget.TargetType)
+        {
+            case (UnitTargetType.Other_Unit):
+                return new UnitPathData(unitTarget, UnitTargetType.Other_Unit, UnitPathType.Attack);
+            case (UnitTargetType.Construction):
+                return new UnitPathData(unitTarget, UnitTargetType.Construction, UnitPathType.Attack);
+            default:
+                return new UnitPathData(null, UnitTargetType.None, UnitPathType.Move);
+        }
+    }
+    
+    IEnumerator Cooldown(float cooldownTime)
+    {
+        CanAttack = false;
+        yield return new WaitForSeconds(cooldownTime);
+        CanAttack = true;
+        OnCooldownEnd?.Invoke();
+    }
 }

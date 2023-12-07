@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 public enum EntityStateID
 {
     Move,
     Build,
-    Atack
+    Attack,
+    Stay,
+    ExtractionResource,
+    StorageResource
 };
 
 public class EntityStateMachine

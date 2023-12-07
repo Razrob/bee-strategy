@@ -1,9 +1,9 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PollenStorage : ResourceSourceBase
 {
+    public override ResourceID ResourceID => ResourceID.Pollen;
     protected ResourceStorage Pollen = new ResourceStorage(100, 100);
     public float MaxPollen => Pollen.Capacity;
     public float CurrentPollen => Pollen.CurrentValue;
@@ -11,11 +11,10 @@ public class PollenStorage : ResourceSourceBase
     public bool isPollinated = false;
     public GameObject Model;
     public GameObject pollinatedModel;
-    
-    public virtual void ExtractPollen(int extracted)
+
+    public override void ExtractResource(int extracted)
     {
         Pollen.ChangeValue(-extracted);
-        Debug.Log("�������� ������ - " + CurrentPollen);
 
         if (CurrentPollen <= 0)
         {
@@ -24,9 +23,8 @@ public class PollenStorage : ResourceSourceBase
             Model.SetActive(false);
             StartCoroutine(StartRePollinating(timer));
         }
-
     }
-
+    
     private IEnumerator StartRePollinating(int duration)
     {
         while (duration > 0)
