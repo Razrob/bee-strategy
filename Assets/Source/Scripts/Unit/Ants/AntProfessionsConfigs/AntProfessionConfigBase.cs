@@ -12,8 +12,8 @@ namespace Unit.Ants
         [field: SerializeField] public AnimatorController AnimatorController { get; private set; }
         [field: SerializeField] public UnitType UnitType { get; private set; }
         [field: SerializeField] public float Range { get; private set; }
-        [field: SerializeField] protected SerializableDictionary<AntType, bool> antsAccess { get; private set; }
+        [field: SerializeField] protected List<AntType> antsAccess { get; private set; }
         
-        public IReadOnlyDictionary<AntType, bool> AntsAccess => antsAccess;
+        public IReadOnlyList<AntType> AntsAccess => antsAccess;
     }
 }

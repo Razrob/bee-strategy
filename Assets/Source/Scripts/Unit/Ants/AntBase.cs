@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unit.Ants.States;
 using UnityEngine;
 
@@ -59,8 +60,7 @@ namespace Unit.Ants
 
         private void SetProfession(AntProfessionConfigBase newProfession)
         {
-            if (!newProfession.AntsAccess.ContainsKey(CurrentAntType) || 
-                !newProfession.AntsAccess[CurrentAntType])
+            if (!newProfession.AntsAccess.Contains(CurrentAntType))
                 return;
 
             if(newProfession == _currentProfessionConfig) 

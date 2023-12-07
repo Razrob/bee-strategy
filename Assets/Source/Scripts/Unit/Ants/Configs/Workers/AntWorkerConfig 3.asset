@@ -10,18 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f23041f8c3de431bb0d7d598c7a4c682, type: 3}
-  m_Name: AntWorkerDefaultConfig
+  m_Name: AntWorkerConfig 3
   m_EditorClassIdentifier: 
   <AnimatorController>k__BackingField: {fileID: 0}
   <UnitType>k__BackingField: 30
   <Range>k__BackingField: 5
-  <antsAccess>k__BackingField:
-    _cells:
-    - Key: 0
-      Value: 1
-    - Key: 10
-      Value: 1
-    - Key: 20
-      Value: 1
+  <antsAccess>k__BackingField: 000000000a00000014000000
   <GatheringCapacity>k__BackingField: 10
   <GatheringTime>k__BackingField: 1.5
