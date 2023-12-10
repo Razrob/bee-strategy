@@ -44,8 +44,7 @@ namespace Unit.Ants.States
         {
             if (!_attackLogic.CheckEnemiesInAttackZone()) return;
             
-            _attackLogic.TryGetNearestDamageableTarget(out IUnitTarget target);
-            _ant.AutoGiveOrder(target, target.Transform.position);
+            _ant.HandleGiveOrder(null, _ant.Transform.position, UnitPathType.Attack);
         }
     }
 }

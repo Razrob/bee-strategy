@@ -22,38 +22,41 @@ public class WorkerLogic : LogicBlockBase
         ExtractionTime = extractionTime;
     }
     
-    protected override bool ValidatePathType(IUnitTarget unitTarget, UnitPathType pathType)
+    protected override bool ValidateHandleOrder(IUnitTarget target, UnitPathType pathType)
     {
+        if (target.IsNullOrUnityNull()) 
+            return false;
+        
         switch (pathType)
         {
             case UnitPathType.Build_Construction:
-                if (unitTarget.TargetType == UnitTargetType.Construction &&
+                if (target.TargetType == UnitTargetType.Construction &&
                     //TODO: create ants constructions
                     // unitTarget.Affiliation == Affiliation &&
-                    unitTarget.CastPossible<BuildingProgressConstruction>())
+                    target.CastPossible<BuildingProgressConstruction>())
                     return true;
                 break;
             case UnitPathType.Repair_Construction:
-                if (unitTarget.TargetType == UnitTargetType.Construction &&
-                    unitTarget.Affiliation == Affiliation &&
-                    unitTarget.CastPossible<ConstructionBase>())
+                if (target.TargetType == UnitTargetType.Construction &&
+                    target.Affiliation == Affiliation &&
+                    target.CastPossible<ConstructionBase>())
                     return true;
                 break;
             case UnitPathType.Collect_Resource:
-                if (unitTarget.TargetType == UnitTargetType.ResourceSource &&
-                    unitTarget.CastPossible<ResourceSourceBase>() &&
+                if (target.TargetType == UnitTargetType.ResourceSource &&
+                    target.CastPossible<ResourceSourceBase>() &&
                     !GotResource)
                     return true;
                 break;
             case UnitPathType.Storage_Resource:
-                if (unitTarget.TargetType == UnitTargetType.Construction &&
-                    unitTarget.CastPossible<TownHall>() &&
+                if (target.TargetType == UnitTargetType.Construction &&
+                    target.CastPossible<TownHall>() &&
                     GotResource)
                     return true;
                 break;
             case UnitPathType.Switch_Profession:
                 if (Affiliation == AffiliationEnum.Ants &&
-                    unitTarget.TargetType == UnitTargetType.Construction)
+                    target.TargetType == UnitTargetType.Construction)
                     // TODO: create construction for switching professions
                     return true;
                 break;
@@ -86,11 +89,18 @@ public class WorkerLogic : LogicBlockBase
         }    
     }
 
+    /// <summary>
+    /// Start resource extraction coroutine
+    /// </summary>
     public void StartExtraction(ResourceID resourceID)
     {
+        ExtractedResourceID = resourceID;
         Unit.StartCoroutine(ExtractResource(ExtractionTime, resourceID));
     }
 
+    /// <summary>
+    /// Stop resource extraction coroutine
+    /// </summary>
     public void StopExtraction()
     {
         if(_extractionCoroutine is null) return;
@@ -98,6 +108,9 @@ public class WorkerLogic : LogicBlockBase
         Unit.StopCoroutine(_extractionCoroutine);
     }
     
+    /// <summary>
+    /// Inform worker logic about put resource in storage
+    /// </summary>
     public void StorageResources()
     {
         GotResource = false;

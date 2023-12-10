@@ -32,7 +32,7 @@ namespace Unit.Ants.States
             if (_ant.UnitPathData.Target.IsNullOrUnityNull())
             {
                 if(Vector3.Distance(_ant.Transform.position, _ant.TargetPosition) < DistanceBuffer)
-                    _ant.AutoGiveOrder(_ant.UnitPathData.Target, _ant.transform.position);
+                    _ant.HandleGiveOrder(_ant.UnitPathData.Target, _ant.transform.position, _ant.UnitPathData.PathType);
             }
             else
             {

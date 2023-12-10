@@ -59,8 +59,7 @@ public abstract class LogicBlockBase
     public Vector3 HandleGiveOrder(IUnitTarget unitTarget, UnitPathType pathType, Vector3 defaultPosition,
         out UnitPathData unitPathData)
     {
-        if(unitTarget.IsNullOrUnityNull() ||
-           !ValidatePathType(unitTarget, pathType))
+        if(!ValidateHandleOrder(unitTarget, pathType))
         {
             unitPathData = new UnitPathData(null, UnitPathType.Move);
             return defaultPosition;
@@ -74,11 +73,17 @@ public abstract class LogicBlockBase
     protected Vector3 TakeMovePosition(UnitPathData pathData)
     {
         return CheckDistance(pathData)
-            ? Transform.position 
-            : pathData.Target.Transform.position;   
+            ? Transform.position
+            : pathData.Target.Transform.position;
     }
 
     protected abstract UnitPathData TakeAutoPathData(IUnitTarget unitTarget);
 
-    protected abstract bool ValidatePathType(IUnitTarget unitTarget, UnitPathType pathType);
+    /// <summary>
+    /// Used in method HandleGiveOrder(...), if return false, then HandleGiveOrder(...) return default position
+    /// </summary>
+    /// <returns>
+    /// return true if values is valid, else return false
+    /// </returns>
+    protected abstract bool ValidateHandleOrder(IUnitTarget target, UnitPathType pathType);
 }

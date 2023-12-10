@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Unit.Ants.States;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Unit.Ants
 {
@@ -53,11 +52,8 @@ namespace Unit.Ants
             AutoGiveOrder(null, TargetPosition);
         }
 
-        public EntityStateID state;
         private void Update()
         {
-            state = _stateMachine.ActiveState;
-            
             _stateMachine.OnUpdate();
             
             foreach (var ability in _abilites)
@@ -126,7 +122,7 @@ namespace Unit.Ants
         {
             defaultPosition.y = 0;
             Vector3 newTargetPos = CurrentProfessionLogic.AutoGiveOrder(unitTarget, defaultPosition, out _unitPathData);
-            SetMovePosition(newTargetPos);
+            SwitchState(newTargetPos);
         }
 
         public void HandleGiveOrder(IUnitTarget unitTarget, Vector3 defaultPosition, UnitPathType unitPathType)
@@ -134,10 +130,10 @@ namespace Unit.Ants
             defaultPosition.y = 0;
 
             Vector3 newTargetPos = CurrentProfessionLogic.HandleGiveOrder(unitTarget, unitPathType, defaultPosition, out _unitPathData);
-            SetMovePosition(newTargetPos);
+            SwitchState(newTargetPos);
         }
 
-        private void SetMovePosition(Vector3 newTargetPosition)
+        private void SwitchState(Vector3 newTargetPosition)
         {
             newTargetPosition.y = 0;
             if(TargetPosition != newTargetPosition)

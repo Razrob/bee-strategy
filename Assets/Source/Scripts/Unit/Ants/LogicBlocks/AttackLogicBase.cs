@@ -101,18 +101,19 @@ public abstract class AttackLogicBase : LogicBlockBase, IDamageApplicator
         return !(nearestTarget is null);
     }
    
-    protected override bool ValidatePathType(IUnitTarget unitTarget, UnitPathType pathType)
+    protected override bool ValidateHandleOrder(IUnitTarget target, UnitPathType pathType)
     {
         switch (pathType)
         {
             case UnitPathType.Attack:
-                if (unitTarget.Affiliation != Affiliation && 
-                    unitTarget.CastPossible<IDamagable>())
+                if(target.IsNullOrUnityNull() ||
+                   target.Affiliation != Affiliation && target.CastPossible<IDamagable>())
                     return true;
                 break;
             case UnitPathType.Switch_Profession:
-                if (Affiliation == AffiliationEnum.Ants &&
-                    unitTarget.TargetType == UnitTargetType.Construction)
+                if (//!target.IsNullOrUnityNull() &&
+                    Affiliation == AffiliationEnum.Ants &&
+                    target.TargetType == UnitTargetType.Construction)
                     // TODO: create construction for switching professions
                     return true;
                 break;
@@ -144,7 +145,8 @@ public abstract class AttackLogicBase : LogicBlockBase, IDamageApplicator
         switch (pathData.PathType)
         {
             case UnitPathType.Attack:
-                return CheckAttackDistance(pathData.Target);
+                return pathData.Target.IsNullOrUnityNull() ||
+                       CheckAttackDistance(pathData.Target);
             default:
                 return CheckInteractionDistance(pathData.Target);
         }
