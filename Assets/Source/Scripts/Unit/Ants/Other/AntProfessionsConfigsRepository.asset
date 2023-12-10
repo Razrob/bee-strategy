@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a21342f90a4476baa64247186c18efa, type: 3}
+  m_Name: AntProfessionsConfigsRepository
+  m_EditorClassIdentifier: 
+  data:
+    _cells:
+    - Key: 0
+      Value:
+        _cells:
+        - Key: 10
+          Value: {fileID: 11400000, guid: 82ee886721b2d1d458f2e2971fb8a041, type: 2}
+        - Key: 20
+          Value: {fileID: 11400000, guid: d4a800be014add54ab7cfa59af388740, type: 2}
+        - Key: 30
+          Value: {fileID: 11400000, guid: 2d5f03323772ea640bb597a770c1a7cd, type: 2}
+    - Key: 10
+      Value:
+        _cells:
+        - Key: 10
+          Value: {fileID: 11400000, guid: a1ffb12e1c656624395609ff1d59c9aa, type: 2}
+        - Key: 20
+          Value: {fileID: 11400000, guid: 7dc325b448c6ed241b1368320fc62c9f, type: 2}
+        - Key: 30
+          Value: {fileID: 11400000, guid: ee42973e9ce20804e8652a618c87d102, type: 2}
+    - Key: 20
+      Value:
+        _cells:
+        - Key: 10
+          Value: {fileID: 11400000, guid: 0e05a1945f44be1448c525b9fd1dbc7d, type: 2}
+        - Key: 20
+          Value: {fileID: 11400000, guid: 30a5dc528948400409613ab999e81e39, type: 2}
+        - Key: 30
+          Value: {fileID: 11400000, guid: fb0467aa8bb2ef04eab3b65dcadc0e09, type: 2}

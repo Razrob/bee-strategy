@@ -4,28 +4,81 @@ using UnityEngine;
 [Serializable]
 public abstract class LogicBlockBase
 {
-    protected readonly Transform Transform;
-    public readonly float Range;
+    protected readonly UnitBase Unit;
     
-    protected LogicBlockBase(Transform transform, float range)
+    protected AffiliationEnum Affiliation => Unit.Affiliation;
+    protected Transform Transform => Unit.transform;
+    
+    public readonly float InteractionRange;
+    
+    protected LogicBlockBase(UnitBase unit, float interactionRange)
     {
-        Transform = transform;
-        Range = range;
+        Unit = unit;
+        InteractionRange = interactionRange;
     }
     
-    /// <returns> return distance between Transform and someTarget</returns>
+    /// <returns>
+    /// return distance between unit and someTarget
+    /// </returns>
     public float Distance(IUnitTarget someTarget) => Vector3.Distance(Transform.position, someTarget.Transform.position);
     
-    /// <summary>
-    /// Set target for unit
-    /// </summary>
-    /// <returns> return current position, if distance for a target less or equal to range, else return target position. If target is null or invalid return default position </returns>
-    public virtual Vector3 GiveOrder(IUnitTarget target, Vector3 defaultPosition)
+    /// <returns>
+    /// return true if distance between unit and someTarget less or equal interaction range, else return false
+    /// </returns>
+    public bool CheckInteractionDistance(IUnitTarget someTarget) => Distance(someTarget) <= InteractionRange;
+    
+    /// <returns>
+    /// return true if unit can doing something with target in pathData on current distance, else return false
+    /// </returns>
+    public virtual bool CheckDistance(UnitPathData pathData) => CheckInteractionDistance(pathData.Target);
+    
+    /// <returns>
+    /// return target move position. If target is invalid return default position
+    /// </returns>
+    public Vector3 AutoGiveOrder(IUnitTarget unitTarget, Vector3 defaultPosition, out UnitPathData unitPathData)
     {
-        if (target.CheckOnNullAndUnityNull()) return defaultPosition;
-        if (Distance(target) <= Range) return Transform.position;
-        return target.Transform.position;
+        if(unitTarget.IsNullOrUnityNull())
+        {
+            unitPathData = new UnitPathData(null, UnitPathType.Move);
+            return defaultPosition;
+        }
+        
+        unitPathData = TakeAutoPathData(unitTarget);
+        if(unitPathData.Target.IsNullOrUnityNull())
+        {
+            unitPathData = new UnitPathData(null, UnitPathType.Move);
+            return defaultPosition;
+        }
+
+        return TakeMovePosition(unitPathData);
     }
     
-    public abstract UnitPathData TakePathData(IUnitTarget unitTarget);
+    /// <returns>
+    /// return target move position and unitPathData with pathType, if pathType invalid return unitPathData with UnitPathType.Move
+    /// </returns>
+    public Vector3 HandleGiveOrder(IUnitTarget unitTarget, UnitPathType pathType, Vector3 defaultPosition,
+        out UnitPathData unitPathData)
+    {
+        if(unitTarget.IsNullOrUnityNull() ||
+           !ValidatePathType(unitTarget, pathType))
+        {
+            unitPathData = new UnitPathData(null, UnitPathType.Move);
+            return defaultPosition;
+        }
+        
+        unitPathData = new UnitPathData(unitTarget, pathType);
+
+        return TakeMovePosition(unitPathData);
+    }
+    
+    protected Vector3 TakeMovePosition(UnitPathData pathData)
+    {
+        return CheckDistance(pathData)
+            ? Transform.position 
+            : pathData.Target.Transform.position;   
+    }
+
+    protected abstract UnitPathData TakeAutoPathData(IUnitTarget unitTarget);
+
+    protected abstract bool ValidatePathType(IUnitTarget unitTarget, UnitPathType pathType);
 }

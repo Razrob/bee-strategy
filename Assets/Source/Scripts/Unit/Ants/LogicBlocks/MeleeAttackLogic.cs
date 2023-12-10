@@ -4,15 +4,16 @@ using UnityEngine;
 [Serializable]
 public class MeleeAttackLogic : AttackLogicBase
 {
-    public MeleeAttackLogic(Transform transform, UnitVisibleZone visibleZone, float attackDistance,
-        AffiliationEnum affiliation, float damage, float attackCooldown, UnitBase unit)
-        : base(transform, attackDistance, visibleZone, affiliation, attackCooldown, damage, unit) { }
+    public MeleeAttackLogic(UnitBase unit, float interactionRange, float attackCooldown, float attackRange, float damage)
+        : base(unit, interactionRange, attackCooldown, attackRange, damage) { }
 
     protected override void Attack(IUnitTarget target)
     {
-        if (Distance(target) > Range) return;
-        if(!DamageableTargetsInVisibleZone.ContainsKey(target)) return;   
-        
-        DamageableTargetsInVisibleZone[target].TakeDamage(this);
+        if (target.TryCast(out IDamagable damageable))
+            damageable.TakeDamage(this);
+#if UNITY_EDITOR
+        else
+            Debug.LogWarning($"Target {target} can't be attacked");
+#endif
     }
 }

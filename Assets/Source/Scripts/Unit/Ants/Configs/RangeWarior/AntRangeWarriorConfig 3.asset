@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18c57076a853415a9b0b8ef07f8ef97d, type: 3}
   m_Name: AntRangeWarriorConfig 3
   m_EditorClassIdentifier: 
+  <AntProfessionRang>k__BackingField: 0
   <AnimatorController>k__BackingField: {fileID: 0}
   <UnitType>k__BackingField: 0
-  <Range>k__BackingField: 12
+  <InteractionRange>k__BackingField: 4
   <antsAccess>k__BackingField: 000000000a00000014000000
   <Damage>k__BackingField: 10
+  <AttackRange>k__BackingField: 12
   <Cooldown>k__BackingField: 1
   <ProjectilePrefab>k__BackingField: {fileID: 7314894331738045515, guid: 845ad4e064a470e478bdf744e08367d5, type: 3}

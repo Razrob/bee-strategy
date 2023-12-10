@@ -12,9 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7d52d8ec25548918dce8f9516aa5192, type: 3}
   m_Name: AntMeleeWarriorConfig 3
   m_EditorClassIdentifier: 
+  <AntProfessionRang>k__BackingField: 0
   <AnimatorController>k__BackingField: {fileID: 0}
   <UnitType>k__BackingField: 0
-  <Range>k__BackingField: 5
+  <InteractionRange>k__BackingField: 4
   <antsAccess>k__BackingField: 000000000a000000
   <Damage>k__BackingField: 20
+  <AttackRange>k__BackingField: 1
   <Cooldown>k__BackingField: 2

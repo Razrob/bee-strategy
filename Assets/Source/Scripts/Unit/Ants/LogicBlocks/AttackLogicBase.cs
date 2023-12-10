@@ -6,45 +6,42 @@ using UnityEngine;
 [Serializable]
 public abstract class AttackLogicBase : LogicBlockBase, IDamageApplicator
 {
-    protected readonly UnitBase Unit;
-    protected readonly AffiliationEnum Affiliation;
     protected readonly UnitVisibleZone VisibleZone;
     protected readonly Dictionary<IUnitTarget, IDamagable> DamageableTargetsInVisibleZone = 
         new Dictionary<IUnitTarget, IDamagable>();
 
     public int EnemiesCount => DamageableTargetsInVisibleZone.Keys.Count;
-    public bool CanAttack { get; private set; }
-    public float CooldownTime { get; set; }
-    public float Damage { get; }
+    public bool CanAttack { get; protected set; }
+    public float CooldownTime { get; protected set; }
+    public float AttackRange { get; protected set; }
+    public float Damage { get; protected set; }
 
-    public event Action OnExitTargetFromAttackZone;
+    public event Action OnExitEnemyFromAttackZone;
     public event Action OnCooldownEnd;
     
-    protected AttackLogicBase(Transform transform, float attackDistance, UnitVisibleZone visibleZone,
-        AffiliationEnum affiliation, float attackCooldown, float damage, UnitBase unit)
-        : base(transform, attackDistance)
+    protected AttackLogicBase(UnitBase unit, float interactionRange, float attackCooldown, float attackRange, float damage)
+        : base(unit, interactionRange)
     {
         CanAttack = true;
-        Unit = unit;
-        Affiliation = affiliation;
         CooldownTime = attackCooldown;
+        AttackRange = attackRange;
         Damage = damage;
         
-        VisibleZone = visibleZone;
+        VisibleZone = unit.VisibleZone;
         VisibleZone.EnterEvent += OnEnterTargetInVisibleZone;
         VisibleZone.ExitEvent += OnExitTargetInVisibleZone;
         
-        foreach (var target in visibleZone.ContainsComponents)
+        foreach (var target in VisibleZone.ContainsComponents)
             OnEnterTargetInVisibleZone(target);
     }
     
     protected void OnEnterTargetInVisibleZone(IUnitTarget target)
     {
-        if (target.CheckOnNullAndUnityNull()) return;
-        if (!target.TryCast(out IDamagable damageable)) return;
-        if (!target.TryCast(out IAffiliation targetAffiliation)) return;
-        if (targetAffiliation.Affiliation == Affiliation) return;
-        if (DamageableTargetsInVisibleZone.ContainsKey(target)) return;
+        if (target.IsNullOrUnityNull() ||
+            target.Affiliation == Affiliation ||
+            !target.TryCast(out IDamagable damageable) || 
+            DamageableTargetsInVisibleZone.ContainsKey(target)) 
+            return;
         
         DamageableTargetsInVisibleZone.Add(target, damageable);
     }
@@ -52,30 +49,23 @@ public abstract class AttackLogicBase : LogicBlockBase, IDamageApplicator
     protected void OnExitTargetInVisibleZone(IUnitTarget target)
     {
         if(DamageableTargetsInVisibleZone.Remove(target))
-            OnExitTargetFromAttackZone?.Invoke();
+            OnExitEnemyFromAttackZone?.Invoke();
     }
+    
+    /// <returns>
+    /// return true if distance between unit and someTarget less or equal attack range, else return false
+    /// </returns>
+    public bool CheckAttackDistance(IUnitTarget someTarget) => Distance(someTarget) <= AttackRange;
     
     /// <returns> return tru if some IDamageable stay in attack zone, else return false</returns>
     public bool CheckEnemiesInAttackZone()
     {
         foreach (var target in DamageableTargetsInVisibleZone.Keys)
-            if (Distance(target) <= Range) return true;
+            if (CheckAttackDistance(target)) return true;
         
         return false;
     }
     
-    public override Vector3 GiveOrder(IUnitTarget target, Vector3 defaultPosition)
-    {
-        if (target.CheckOnNullAndUnityNull()) return defaultPosition;
-        if (!target.CastPossible<IDamagable>()) return defaultPosition;
-        if (!target.TryCast(out IAffiliation targetAffiliation)) return defaultPosition;
-        if (targetAffiliation.Affiliation == Affiliation) return defaultPosition;
-        if (!DamageableTargetsInVisibleZone.ContainsKey(target)) return defaultPosition;
-        if (Distance(target) > Range) return target.Transform.position;
-        
-        return Transform.position;
-    }
-
     /// <summary>
     /// Attack target, if target can't be attacked, then attack nearest enemy
     /// </summary>
@@ -83,7 +73,7 @@ public abstract class AttackLogicBase : LogicBlockBase, IDamageApplicator
     {
         if(!CanAttack) return;
         
-        if (!target.CheckOnNullAndUnityNull() && Distance(target) <= Range)
+        if (!target.IsNullOrUnityNull() && CheckAttackDistance(target) && target.CastPossible<IDamagable>())
             Attack(target);
         else if(TryGetNearestDamageableTarget(out IUnitTarget nearestTarget))
             Attack(nearestTarget);
@@ -101,7 +91,7 @@ public abstract class AttackLogicBase : LogicBlockBase, IDamageApplicator
         foreach (var target in DamageableTargetsInVisibleZone)
         {
             float distance = Distance(target.Key);
-            if (distance <= Range && distance < currentDistance)
+            if (distance <= AttackRange && distance < currentDistance)
             {
                 nearestTarget = target.Key;
                 currentDistance = distance;
@@ -110,26 +100,56 @@ public abstract class AttackLogicBase : LogicBlockBase, IDamageApplicator
 
         return !(nearestTarget is null);
     }
-    
-    public override UnitPathData TakePathData(IUnitTarget unitTarget)
+   
+    protected override bool ValidatePathType(IUnitTarget unitTarget, UnitPathType pathType)
     {
-        if (unitTarget.CheckOnNullAndUnityNull() ||
+        switch (pathType)
+        {
+            case UnitPathType.Attack:
+                if (unitTarget.Affiliation != Affiliation && 
+                    unitTarget.CastPossible<IDamagable>())
+                    return true;
+                break;
+            case UnitPathType.Switch_Profession:
+                if (Affiliation == AffiliationEnum.Ants &&
+                    unitTarget.TargetType == UnitTargetType.Construction)
+                    // TODO: create construction for switching professions
+                    return true;
+                break;
+        }
+
+        return false;
+    }
+    
+    protected override UnitPathData TakeAutoPathData(IUnitTarget unitTarget)
+    {
+        if (unitTarget.IsNullOrUnityNull() ||
             !unitTarget.CastPossible<IDamagable>() ||
-            !unitTarget.TryCast(out IAffiliation affiliation) ||
-            affiliation.Affiliation == Affiliation)
-            return new UnitPathData(null, UnitTargetType.None, UnitPathType.Move);
+            unitTarget.Affiliation == Affiliation)
+            return new UnitPathData(null, UnitPathType.Move);
             
         switch (unitTarget.TargetType)
         {
             case (UnitTargetType.Other_Unit):
-                return new UnitPathData(unitTarget, UnitTargetType.Other_Unit, UnitPathType.Attack);
+                return new UnitPathData(unitTarget, UnitPathType.Attack);
             case (UnitTargetType.Construction):
-                return new UnitPathData(unitTarget, UnitTargetType.Construction, UnitPathType.Attack);
+                return new UnitPathData(unitTarget, UnitPathType.Attack);
             default:
-                return new UnitPathData(null, UnitTargetType.None, UnitPathType.Move);
+                return new UnitPathData(null, UnitPathType.Move);
         }
     }
     
+    public override bool CheckDistance(UnitPathData pathData)
+    {
+        switch (pathData.PathType)
+        {
+            case UnitPathType.Attack:
+                return CheckAttackDistance(pathData.Target);
+            default:
+                return CheckInteractionDistance(pathData.Target);
+        }
+    }
+
     IEnumerator Cooldown(float cooldownTime)
     {
         CanAttack = false;

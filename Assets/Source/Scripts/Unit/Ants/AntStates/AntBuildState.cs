@@ -7,6 +7,7 @@ namespace Unit.Ants.States
         public override EntityStateID EntityStateID => EntityStateID.Build;
 
         private readonly AntBase _ant;
+        private BuildingProgressConstruction _buildingProgressConstruction;
         
         public AntBuildState(AntBase ant)
         {
@@ -17,27 +18,27 @@ namespace Unit.Ants.States
         {
             if (_ant.ProfessionType != AntProfessionType.Worker ||
                 _ant.UnitPathData.TargetType != UnitTargetType.Construction ||
-                _ant.UnitPathData.Target.CheckOnNullAndUnityNull() ||
-                !_ant.UnitPathData.Target.TryCast(out BuildingProgressConstruction buildingProgressConstruction))
+                _ant.UnitPathData.Target.IsNullOrUnityNull() ||
+                !_ant.UnitPathData.Target.TryCast(out _buildingProgressConstruction))
             {
                 Debug.LogWarning($"Some problem: " +
                                  $"{_ant.ProfessionType} | " +
                                  $"{_ant.UnitPathData.TargetType} | " +
-                                 $"{_ant.UnitPathData.Target.CheckOnNullAndUnityNull()} | " +
-                                 $"{!_ant.UnitPathData.Target.TryCast(out buildingProgressConstruction)}");
+                                 $"{_ant.UnitPathData.Target.IsNullOrUnityNull()} | " +
+                                 $"{!_ant.UnitPathData.Target.TryCast(out _buildingProgressConstruction)}");
                 
-                _ant.GiveOrder(null, _ant.transform.position);
-                // _ant.StateMachine.SetState(EntityStateID.Stay);
+                _ant.AutoGiveOrder(null, _ant.transform.position);
                 return;
             }
             
-            buildingProgressConstruction.WorkerArrived = true;
-            buildingProgressConstruction.OnTimerEnd += EndOfBuildConstruction;
+            _buildingProgressConstruction.WorkerArrived = true;
+            _buildingProgressConstruction.OnTimerEnd += EndOfBuildConstruction;
         }
 
         public override void OnStateExit()
         {
-            
+            _buildingProgressConstruction.WorkerArrived = false;
+            _buildingProgressConstruction.OnTimerEnd -= EndOfBuildConstruction;
         }
 
         public override void OnUpdate()
@@ -49,7 +50,7 @@ namespace Unit.Ants.States
         {
             buildingProgressConstruction.WorkerArrived = false;
 
-            _ant.GiveOrder(null, _ant.transform.position);
+            _ant.AutoGiveOrder(null, _ant.transform.position);
         }
     }
 }

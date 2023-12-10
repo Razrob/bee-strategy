@@ -5,6 +5,7 @@
     Build_Construction = 20,
     Attack = 30,
     Move = 40,
-    Storage_Resource = 50
-    ///
+    Storage_Resource = 50,
+    Switch_Profession = 60,
+    Repair_Construction = 70
 }

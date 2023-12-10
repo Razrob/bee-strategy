@@ -9,7 +9,6 @@ namespace Unit.Ants.States
         private readonly AntBase _ant;
 
         private WorkerLogic _workerLogic;
-        private TownHall _townHall;
         
         public AntStorageResourceState(AntBase ant)
         {
@@ -21,23 +20,22 @@ namespace Unit.Ants.States
             if (_ant.ProfessionType != AntProfessionType.Worker ||
                 !_ant.CurrentProfessionLogic.TryCast(out _workerLogic) ||
                 !_workerLogic.GotResource ||
-                !_ant.UnitPathData.Target.TryCast(out _townHall))
+                !_ant.UnitPathData.Target.CastPossible<TownHall>())
             {
+#if UNITY_EDITOR
                 Debug.LogWarning($"Some problem: " +
                                  $"{_ant.ProfessionType} | " +
                                  $"{!_ant.CurrentProfessionLogic.TryCast(out _workerLogic)} | " +
-                                 $"{!_ant.UnitPathData.Target.TryCast(out _townHall)}");
-                
-                _ant.GiveOrder(null, _ant.transform.position);
-                // _ant.StateMachine.SetState(EntityStateID.Stay);
+                                 $"{!_ant.UnitPathData.Target.CastPossible<TownHall>()}");            
+#endif
+                _ant.AutoGiveOrder(null, _ant.transform.position);
                 return;
             }
             
             ResourceGlobalStorage.ChangeValue(ResourceID.Pollen, _workerLogic.ExtractionCapacity);
-            _workerLogic.ResourcesStoraged();
+            _workerLogic.StorageResources();
             
-            _ant.GiveOrder(null, _ant.transform.position);
-            // _ant.StateMachine.SetState(EntityStateID.Stay);
+            _ant.AutoGiveOrder(null, _ant.transform.position);
         }
 
         public override void OnStateExit()
@@ -49,6 +47,5 @@ namespace Unit.Ants.States
         {
             
         }
-        
     }
 }

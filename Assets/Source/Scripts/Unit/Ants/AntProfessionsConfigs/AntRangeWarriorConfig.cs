@@ -7,6 +7,6 @@ namespace Unit.Ants
     {
         [field: SerializeField] public GameObject ProjectilePrefab { get; private set; }
 
-        public override AntProfessionType Profession => AntProfessionType.RangeWarrior;
+        public override AntProfessionType ProfessionType => AntProfessionType.RangeWarrior;
     }
 }

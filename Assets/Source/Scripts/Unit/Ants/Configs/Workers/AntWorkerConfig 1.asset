@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f23041f8c3de431bb0d7d598c7a4c682, type: 3}
   m_Name: AntWorkerConfig 1
   m_EditorClassIdentifier: 
+  <AntProfessionRang>k__BackingField: 0
   <AnimatorController>k__BackingField: {fileID: 0}
   <UnitType>k__BackingField: 30
-  <Range>k__BackingField: 5
+  <InteractionRange>k__BackingField: 4
   <antsAccess>k__BackingField: 000000000a00000014000000
   <GatheringCapacity>k__BackingField: 10
   <GatheringTime>k__BackingField: 3

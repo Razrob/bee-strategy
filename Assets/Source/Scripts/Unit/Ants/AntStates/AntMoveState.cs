@@ -5,6 +5,8 @@ namespace Unit.Ants.States
     public class AntMoveState : EntityStateBase
     {
         public override EntityStateID EntityStateID => EntityStateID.Move;
+
+        private const float DistanceBuffer = 0.1f;
         
         private readonly AntBase _ant;
         
@@ -27,17 +29,15 @@ namespace Unit.Ants.States
 
         public override void OnUpdate()
         {
-            if (_ant.UnitPathData.TargetType == UnitTargetType.None)
+            if (_ant.UnitPathData.Target.IsNullOrUnityNull())
             {
-                if(Vector3.Distance(_ant.Transform.position, _ant.TargetPosition) < 0.1f)
-                    _ant.GiveOrder(_ant.UnitPathData.Target, _ant.transform.position);
+                if(Vector3.Distance(_ant.Transform.position, _ant.TargetPosition) < DistanceBuffer)
+                    _ant.AutoGiveOrder(_ant.UnitPathData.Target, _ant.transform.position);
             }
             else
             {
-                if (_ant.CurrentProfessionLogic.Distance(_ant.UnitPathData.Target) <= _ant.CurrentProfessionLogic.Range)
-                {
-                    _ant.GiveOrder(_ant.UnitPathData.Target, _ant.Transform.position);
-                }
+                if (_ant.CurrentProfessionLogic.CheckDistance(_ant.UnitPathData))
+                    _ant.HandleGiveOrder(_ant.UnitPathData.Target, _ant.transform.position, _ant.UnitPathData.PathType);
             }
         }
 

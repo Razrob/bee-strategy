@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 namespace Unit.Ants.States
@@ -7,11 +6,10 @@ namespace Unit.Ants.States
     {
         public override EntityStateID EntityStateID => EntityStateID.ExtractionResource;
 
-        private WorkerLogic _workerLogic;
-        private ResourceSourceBase _resourceSource;
         private readonly AntBase _ant;
 
-        private Coroutine _coroutine;
+        private WorkerLogic _workerLogic;
+        private ResourceSourceBase _resourceSource;
         
         public AntResourceExtractionState(AntBase ant)
         {
@@ -25,39 +23,30 @@ namespace Unit.Ants.States
                 _workerLogic.GotResource ||
                 !_ant.UnitPathData.Target.TryCast(out _resourceSource))
             {
+#if UNITY_EDITOR
                 Debug.LogWarning($"Some problem: {_ant.ProfessionType} " +
                                  $"| {!_ant.CurrentProfessionLogic.TryCast(out _workerLogic)} " +
                                  $"| {!_ant.UnitPathData.Target.TryCast(out _resourceSource)}");
-                
-                _ant.GiveOrder(null, _ant.transform.position);
-                // _ant.StateMachine.SetState(EntityStateID.Stay);
+#endif
+                _ant.AutoGiveOrder(null, _ant.transform.position);
                 return;
             }
             
-            _coroutine = _ant.StartCoroutine(ExtractResource(2));
+            _workerLogic.OnResourceExtracted += ResourceExtracted;
+            _workerLogic.StartExtraction(_resourceSource.ResourceID);
         }
 
         public override void OnStateExit()
         {
-            if(_coroutine != null)
-                _ant.StopCoroutine(_coroutine);
+            _workerLogic.OnResourceExtracted -= ResourceExtracted;
+            _workerLogic.StopExtraction();
         }
 
         public override void OnUpdate() { }
-        
-        IEnumerator ExtractResource(float extractionTime)
-        {
-            yield return new WaitForSeconds(extractionTime);
 
-            if (_resourceSource is null)
-            {
-                _ant.GiveOrder(null, _ant.transform.position);
-                yield break;
-            }
-            
-            _resourceSource.ExtractResource(_workerLogic.ExtractionCapacity);
-            _workerLogic.ResourceExtracted(_resourceSource.ResourceID);
-            _ant.GiveOrder(null, _ant.transform.position);
+        private void ResourceExtracted()
+        {
+            _ant.AutoGiveOrder(null, _ant.transform.position);
         }
     }
 }

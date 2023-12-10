@@ -2,6 +2,6 @@ namespace Unit.Ants
 {
     public class HeavyAnt : AntBase
     {
-        public override AntType CurrentAntType => AntType.Heavy;
+        public override AntType AntType => AntType.Heavy;
     }
 }

@@ -3,35 +3,39 @@ using System.Collections.Generic;
 using System.Linq;
 using Unit.Ants.States;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Unit.Ants
 {
     public abstract class AntBase : AntUnit
     {
-        public abstract AntType CurrentAntType { get; }
+        public abstract AntType AntType { get; }
         
         [SerializeField] private GameObject resource;
-        [SerializeField] protected AntProfessionConfigBase DefaultProfessionConfig;
+        [SerializeField] private AntProfessionConfigBase defaultProfessionConfig;
+        [SerializeField] private Animator animator;
         
         private AntProfessionConfigBase _currentProfessionConfig;
+        private UnitPathData _unitPathData;
         
-        public AntProfessionType ProfessionType => _currentProfessionConfig.Profession;
-        public UnitType UnitType => _currentProfessionConfig.UnitType; 
+        public UnitType UnitType => _currentProfessionConfig.UnitType;
         public EntityStateID CurrentState => _stateMachine.ActiveState;
+        public AntProfessionType ProfessionType => _currentProfessionConfig.ProfessionType;
+        public AntProfessionRang ProfessionRang => _currentProfessionConfig.AntProfessionRang;
+        public AntProfessionType TargetProfessionType { get; private set; }
+        public AntProfessionRang TargetProfessionRang { get; private set; }
         
+        public UnitPathData UnitPathData => _unitPathData;
         public LogicBlockBase CurrentProfessionLogic { get; private set; }
-        public UnitPathData UnitPathData { get; private set; }
         public Vector3 TargetPosition { get; private set; }
 
         public event Action OnTargetPositionChange;
-        public event Action OnSwitchProfession;
         
         private void Start()
         {
             UnitPool.Instance.UnitCreation(this);
             HideResource();
-            TargetPosition = transform.position;
-            SetProfession(DefaultProfessionConfig);
+            SetProfession(defaultProfessionConfig);
 
             List<EntityStateBase> stateBases = new List<EntityStateBase>()
             {
@@ -40,15 +44,20 @@ namespace Unit.Ants
                 new AntBuildState(this),
                 new AntResourceExtractionState(this),
                 new AntStorageResourceState(this),
-                new AntAttackState(this)
+                new AntAttackState(this),
+                new AntSwitchProfessionState(this)
             };
             _stateMachine = new EntityStateMachine(stateBases, EntityStateID.Stay);
 
-            GiveOrder(null, TargetPosition);
+            TargetPosition = transform.position;
+            AutoGiveOrder(null, TargetPosition);
         }
-        
+
+        public EntityStateID state;
         private void Update()
         {
+            state = _stateMachine.ActiveState;
+            
             _stateMachine.OnUpdate();
             
             foreach (var ability in _abilites)
@@ -60,10 +69,8 @@ namespace Unit.Ants
 
         private void SetProfession(AntProfessionConfigBase newProfession)
         {
-            if (!newProfession.AntsAccess.Contains(CurrentAntType))
-                return;
-
-            if(newProfession == _currentProfessionConfig) 
+            if (!newProfession.AntsAccess.Contains(AntType) ||
+                newProfession == _currentProfessionConfig) 
                 return;
 
             _currentProfessionConfig = newProfession;
@@ -71,9 +78,9 @@ namespace Unit.Ants
             {
                 case (AntProfessionType.Worker):
                     var workerLogic = new AntWorkerLogic(this, _currentProfessionConfig as AntWorkerConfig);
-                    CurrentProfessionLogic = workerLogic;
                     workerLogic.OnResourceExtracted += ShowResource;
-                    workerLogic.OnResourcesStoraged += HideResource;
+                    workerLogic.OnStorageResources += HideResource;
+                    CurrentProfessionLogic = workerLogic;
                     break;
                 case (AntProfessionType.MeleeWarrior):
                     CurrentProfessionLogic = new AntMeleeAttackLogic(this, _currentProfessionConfig as AntMeleeWarriorConfig);
@@ -82,76 +89,84 @@ namespace Unit.Ants
                     CurrentProfessionLogic  = new AntRangeAttackLogic(this, _currentProfessionConfig as AntRangeWarriorConfig);
                     break;
                 default: throw new NotImplementedException();
-            }  
+            }
+
+            animator.runtimeAnimatorController = _currentProfessionConfig.AnimatorController;
         }
         
         public void SwitchProfession(AntProfessionConfigBase newProfession)
         {
             SetProfession(newProfession);
-
-            GiveOrder(UnitPathData?.Target, TargetPosition);
+            AutoGiveOrder(null, transform.position);
         }
-
+        
         public override void GiveOrder(GameObject target, Vector3 position)
         {
             position.y = 0;
-            
-            GiveOrder(target.GetComponent<IUnitTarget>(), position);
+            AutoGiveOrder(target.GetComponent<IUnitTarget>(), position);
         }
+        
+        public void GiveOrderSwitchProfession(IUnitTarget unitTarget, Vector3 defaultPosition,
+            AntProfessionType newProfessionType, AntProfessionRang newProfessionRang)
+        {
+            if(newProfessionType == ProfessionType && newProfessionRang == ProfessionRang || 
+               unitTarget.IsNullOrUnityNull())
+            {
+                AutoGiveOrder(unitTarget, defaultPosition);
+                return;
+            }
 
-        public void GiveOrder(IUnitTarget unitTarget, Vector3 defaultPosition)
+            TargetProfessionType = newProfessionType;
+            TargetProfessionRang = newProfessionRang;
+            
+            HandleGiveOrder(unitTarget, defaultPosition, UnitPathType.Switch_Profession);
+        }
+        
+        public void AutoGiveOrder(IUnitTarget unitTarget, Vector3 defaultPosition)
         {
             defaultPosition.y = 0;
-            
-            UnitPathData = CurrentProfessionLogic.TakePathData(unitTarget);
-            Vector3 newTargetPosition = CurrentProfessionLogic.GiveOrder(unitTarget, defaultPosition);
+            Vector3 newTargetPos = CurrentProfessionLogic.AutoGiveOrder(unitTarget, defaultPosition, out _unitPathData);
+            SetMovePosition(newTargetPos);
+        }
+
+        public void HandleGiveOrder(IUnitTarget unitTarget, Vector3 defaultPosition, UnitPathType unitPathType)
+        {
+            defaultPosition.y = 0;
+
+            Vector3 newTargetPos = CurrentProfessionLogic.HandleGiveOrder(unitTarget, unitPathType, defaultPosition, out _unitPathData);
+            SetMovePosition(newTargetPos);
+        }
+
+        private void SetMovePosition(Vector3 newTargetPosition)
+        {
             newTargetPosition.y = 0;
             if(TargetPosition != newTargetPosition)
             {
                 TargetPosition = newTargetPosition;
                 OnTargetPositionChange?.Invoke();
             }
-            else
-                TargetPosition = newTargetPosition;
             
             Vector3 curPos = transform.position;
             curPos.y = 0;
-            
-            var prevState = CurrentState;
-            EntityStateID newState;
             if (TargetPosition == curPos)
             {
-                switch (UnitPathData.PathType)
+                var newState = UnitPathData.PathType switch
                 {
-                    case UnitPathType.Attack:
-                        newState = EntityStateID.Attack;
-                        break;
-                    case UnitPathType.Collect_Resource:
-                        newState = EntityStateID.ExtractionResource;
-                        break;
-                    case UnitPathType.Storage_Resource:
-                        newState = EntityStateID.StorageResource;
-                        break;
-                    case UnitPathType.Build_Construction:
-                        newState = EntityStateID.Build;
-                        break;
-                    case UnitPathType.Move:
-                        newState = EntityStateID.Stay;
-                        break;
-                    default: throw new NotImplementedException();
-                }
-                
+                    UnitPathType.Attack => EntityStateID.Attack,
+                    UnitPathType.Collect_Resource => EntityStateID.ExtractionResource,
+                    UnitPathType.Storage_Resource => EntityStateID.StorageResource,
+                    UnitPathType.Build_Construction => EntityStateID.Build,
+                    UnitPathType.Move => EntityStateID.Stay,
+                    UnitPathType.Switch_Profession => EntityStateID.SwitchProfession,
+                    UnitPathType.Repair_Construction => throw new NotImplementedException(),
+                    _ => throw new NotImplementedException()
+                };
+
                 StateMachine.SetState(newState);
             }
             else
             {
-                newState = EntityStateID.Move;
-                StateMachine.SetState(newState);
-            }
-
-            if (prevState == newState)
-            {
-                OnSwitchProfession?.Invoke();
+                StateMachine.SetState(EntityStateID.Move);
             }
         }
     }

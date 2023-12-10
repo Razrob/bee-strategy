@@ -8,7 +8,8 @@ public enum EntityStateID
     Attack,
     Stay,
     ExtractionResource,
-    StorageResource
+    StorageResource,
+    SwitchProfession
 };
 
 public class EntityStateMachine
