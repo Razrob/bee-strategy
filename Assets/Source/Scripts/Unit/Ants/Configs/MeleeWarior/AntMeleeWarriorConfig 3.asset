@@ -18,5 +18,5 @@ MonoBehaviour:
   <InteractionRange>k__BackingField: 4
   <antsAccess>k__BackingField: 000000000a000000
   <Damage>k__BackingField: 20
-  <AttackRange>k__BackingField: 1
+  <AttackRange>k__BackingField: 4
   <Cooldown>k__BackingField: 2
