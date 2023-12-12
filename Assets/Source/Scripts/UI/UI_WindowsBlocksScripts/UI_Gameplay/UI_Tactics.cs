@@ -7,9 +7,9 @@ public class UI_Tactics : UIScreen
 
     private void Awake()
     {
-        _screenButtons[0].ScreenButtonClicked += OnTactic1Clicked;
-        _screenButtons[1].ScreenButtonClicked += OnTactic2Clicked;
-        _screenButtons[2].ScreenButtonClicked += OnTactic3Clicked;
+        // _screenButtons[0].ScreenButtonClicked += OnTactic1Clicked;
+        // _screenButtons[1].ScreenButtonClicked += OnTactic2Clicked;
+        // _screenButtons[2].ScreenButtonClicked += OnTactic3Clicked;
     }
 
     private void OnTactic1Clicked()

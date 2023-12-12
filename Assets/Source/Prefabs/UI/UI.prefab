@@ -1293,6 +1293,18 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -367
       objectReference: {fileID: 0}
+    - target: {fileID: 625147103205946782, guid: 8f6fd508a6f070c41be39c081d913935, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 625147103205946782, guid: 8f6fd508a6f070c41be39c081d913935, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 5868268006567620579}
+    - target: {fileID: 625147103205946782, guid: 8f6fd508a6f070c41be39c081d913935, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: _SpawnStickyTile
+      objectReference: {fileID: 0}
     - target: {fileID: 764136121353260763, guid: 8f6fd508a6f070c41be39c081d913935, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0.75
