@@ -1,5 +1,35 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2171523936653684942
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8333183905838928826}
+  m_Layer: 0
+  m_Name: SpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8333183905838928826
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2171523936653684942}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1274404536982251029}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7643734426281723572
 GameObject:
   m_ObjectHideFlags: 0
@@ -92,6 +122,7 @@ Transform:
   - {fileID: 7004317949016415637}
   - {fileID: 753298931353431248}
   - {fileID: 744820234656374079}
+  - {fileID: 8333183905838928826}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -165,7 +196,7 @@ MonoBehaviour:
     - Key: 0
       Value: 3
   pauseTimeOfOutBeesFromTownHallAfterAlarm: 1
-  workerBeesSpawnPosition: {fileID: 5545980254773833652}
+  workerBeesSpawnPosition: {fileID: 8333183905838928826}
 --- !u!208 &4844941556788702066
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -290,10 +321,6 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: f8942df3ef59c894c9b49b9034f00253, type: 2}
-    - target: {fileID: 4351874455037664214, guid: ffb8c292185cd514094b2e78bf50524d, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5918854304423215760, guid: ffb8c292185cd514094b2e78bf50524d, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -303,11 +330,6 @@ PrefabInstance:
 --- !u!4 &7004317949016415637 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2678729469616822426, guid: ffb8c292185cd514094b2e78bf50524d, type: 3}
-  m_PrefabInstance: {fileID: 4906834878104175887}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &5545980254773833652 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 643966344881662651, guid: ffb8c292185cd514094b2e78bf50524d, type: 3}
   m_PrefabInstance: {fileID: 4906834878104175887}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7994231403088893632

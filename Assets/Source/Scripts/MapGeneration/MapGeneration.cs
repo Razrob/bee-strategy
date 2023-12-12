@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
@@ -42,13 +40,15 @@ public class MapGeneration : MonoBehaviour
 
     private void GenerateMap()
     {
+        float yValue = 0;
         bool stopGenerate = false;
         while (!stopGenerate)
         {
+            Vector3 spawnPos = FrameworkCommander.GlobalData.ConstructionsRepository.RoundPositionToGrid(_currentTilePosition);
+            spawnPos.y = -spawnPos.z/10000;
             int tileNum = (int)Random.Range(0, tilesPrefabs.Count);
-
-            Instantiate(tilesPrefabs[tileNum], FrameworkCommander.GlobalData.ConstructionsRepository.RoundPositionToGrid(_currentTilePosition), Quaternion.Euler(0, 0, 0), this.transform);
-
+            Instantiate(tilesPrefabs[tileNum],spawnPos, Quaternion.Euler(0, 0, 0), this.transform);
+            
             int tryToSpawnFlower = (int)Random.Range(0, 100);
             int tryToSpawnBush = (int)Random.Range(0, 100);
             int tryToSpawnGrass = (int)Random.Range(0, 100);
@@ -58,36 +58,34 @@ public class MapGeneration : MonoBehaviour
             {
                 int flowerNum = (int)Random.Range(0, flowerPrefabs.Count);
 
-                Instantiate(flowerPrefabs[flowerNum], FrameworkCommander.GlobalData.ConstructionsRepository.RoundPositionToGrid(_currentTilePosition), Quaternion.Euler(0, 0, 0), this.transform);
+                Instantiate(flowerPrefabs[flowerNum], spawnPos, Quaternion.Euler(0, 0, 0), this.transform);
             }
             else if (tryToSpawnBush < bushGenChance)
             {
-                Instantiate(bushPrefab, FrameworkCommander.GlobalData.ConstructionsRepository.RoundPositionToGrid(_currentTilePosition), Quaternion.Euler(0, 0, 0), this.transform);
+                Instantiate(bushPrefab, spawnPos, Quaternion.Euler(0, 0, 0), this.transform);
             }
             else if (tryToSpawnGrass < grassGenChance)
             {
-                Instantiate(grassPrefab, FrameworkCommander.GlobalData.ConstructionsRepository.RoundPositionToGrid(_currentTilePosition), Quaternion.Euler(0, 0, 0), this.transform);
+                Instantiate(grassPrefab, spawnPos, Quaternion.Euler(0, 0, 0), this.transform);
             }
             else if (tryToSpawnClover < cloverGenChance)
             {
-                Instantiate(cloverPrefab, FrameworkCommander.GlobalData.ConstructionsRepository.RoundPositionToGrid(_currentTilePosition), Quaternion.Euler(0, 0, 0), this.transform);
+                Instantiate(cloverPrefab, spawnPos, Quaternion.Euler(0, 0, 0), this.transform);
             }
-
-
+            
             _currentTilePosition.x += _constructionConfig.HexagonsOffcets.x/2;
 
             if (_currentTilePosition.x > centralPosition.x + width/2)
             {
                 _currentTilePosition.x = centralPosition.x - width/2;
                 _currentTilePosition.z -= _constructionConfig.HexagonsOffcets.y * 2;
+                yValue += 0.0001f;
                 if (_currentTilePosition.z < centralPosition.z - height/2)
                 {
                     stopGenerate = true;
                 }
             }  
         }
-        
-        Destroy(this);
     }
     
 }

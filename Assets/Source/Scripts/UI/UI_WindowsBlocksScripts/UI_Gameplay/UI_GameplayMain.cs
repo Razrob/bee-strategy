@@ -8,7 +8,6 @@ public class UI_GameplayMain : UIScreen
     [Serializable]
     private struct SomeResourcePrint
     {
-        public TextMeshProUGUI name;
         public Image Icon;
         public TextMeshProUGUI value;
     }
@@ -21,16 +20,12 @@ public class UI_GameplayMain : UIScreen
     private void Start()
     {
         pollen.Icon.sprite = ResourceGlobalStorage.GetResource(ResourceID.Pollen).Icon;
-        pollen.name.text = ResourceGlobalStorage.GetResource(ResourceID.Pollen).ID.ToString();
         
         wax.Icon.sprite = ResourceGlobalStorage.GetResource(ResourceID.Bees_Wax).Icon;
-        wax.name.text = ResourceGlobalStorage.GetResource(ResourceID.Bees_Wax).ID.ToString();
         
         housing.Icon.sprite = ResourceGlobalStorage.GetResource(ResourceID.Housing).Icon;
-        housing.name.text = ResourceGlobalStorage.GetResource(ResourceID.Housing).ID.ToString();
 
         honey.Icon.sprite = ResourceGlobalStorage.GetResource(ResourceID.Honey).Icon;
-        honey.name.text = ResourceGlobalStorage.GetResource(ResourceID.Honey).ID.ToString();
     }
 
     private void Awake()

@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e722b84b2076d848ab5e0208714dfa8, type: 3}
   m_Name: BuildingGridConfig
   m_EditorClassIdentifier: 
-  _hexagonsOffcets: {x: 8.37, y: 1.27}
+  _hexagonsOffcets: {x: 8.59, y: 1.63}

@@ -8,7 +8,7 @@ public class WorkerDuty : MonoBehaviour
     private UI_GameplayMain UI_Counter;
     public Vector3 destination;
     public int loadCapacity;
-    private Transform ResourceSkin;
+    [SerializeField] private GameObject ResourceSkin;
     public GameObject WorkingOnGO;
 
     public float GatherTimer;
@@ -17,8 +17,6 @@ public class WorkerDuty : MonoBehaviour
     {
         isGathering = false;
         UI_Counter = GameObject.Find("UI_GameplayMain").GetComponent<UI_GameplayMain>();
-        
-        ResourceSkin = gameObject.transform.parent.GetChild(2);
     }
 
     void Update()
@@ -51,7 +49,7 @@ public class WorkerDuty : MonoBehaviour
                     if (gotResource && collider.gameObject.name == "TownHall")
                     {
                         gotResource = false;
-                        ResourceSkin.transform.gameObject.SetActive(false);
+                        ResourceSkin.SetActive(false);
                         isFindingRes = true;
                         ResourceGlobalStorage.ChangeValue(ResourceID.Pollen, loadCapacity);
 
@@ -80,7 +78,7 @@ public class WorkerDuty : MonoBehaviour
 
     void OnTriggerStay(Collider collider)
     {
-        if (collider.gameObject == WorkingOnGO && !collider.transform.parent.GetComponent<PollenStorage>().isPollinated)
+        if (collider.gameObject == WorkingOnGO && !collider.GetComponent<PollenStorage>().isPollinated)
         {
             if (isFindingRes && !isGathering)
             {
@@ -95,11 +93,11 @@ public class WorkerDuty : MonoBehaviour
             if (GatherTimer > 3 && isGathering)
             {
                 gotResource = true;
-                ResourceSkin.transform.gameObject.SetActive(true);
+                ResourceSkin.SetActive(true);
                 isFindingRes = false;
                 isGathering = false;
 
-                collider.transform.parent.GetComponent<PollenStorage>().ExtractResource(loadCapacity);
+                collider.GetComponent<PollenStorage>().ExtractResource(loadCapacity);
 
                 
                 GameObject Base = GameObject.Find("TownHall");

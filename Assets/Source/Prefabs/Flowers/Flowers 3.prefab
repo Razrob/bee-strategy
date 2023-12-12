@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8145321887757549291}
   m_Layer: 0
   m_Name: PollenCounter
-  m_TagString: Untagged
+  m_TagString: PollenSource
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -26,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1133897304655841964}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4, y: 0.5, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 3175578721399335267}
@@ -61,7 +61,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
+  m_Size: {x: 2, y: 1, z: 2}
   m_Center: {x: 0, y: 7, z: 0}
 --- !u!1 &8053205028514419177
 GameObject:
@@ -121,6 +121,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 0.8
       objectReference: {fileID: 0}
+    - target: {fileID: 1493209310282104147, guid: 6fc0acfb88a27d54bb4fb281e912e253, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.1
+      objectReference: {fileID: 0}
     - target: {fileID: 4370587484897013116, guid: 6fc0acfb88a27d54bb4fb281e912e253, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -156,6 +160,10 @@ PrefabInstance:
     - target: {fileID: 4777901455048847436, guid: 6fc0acfb88a27d54bb4fb281e912e253, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4777901455048847436, guid: 6fc0acfb88a27d54bb4fb281e912e253, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.1
       objectReference: {fileID: 0}
     - target: {fileID: 8785561823920426916, guid: 6fc0acfb88a27d54bb4fb281e912e253, type: 3}
       propertyPath: m_Size.x
@@ -227,7 +235,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9004721185725440106, guid: 6fc0acfb88a27d54bb4fb281e912e253, type: 3}
       propertyPath: m_TagString
-      value: PollenSource
+      value: Untagged
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6fc0acfb88a27d54bb4fb281e912e253, type: 3}
@@ -268,6 +276,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 0.8
       objectReference: {fileID: 0}
+    - target: {fileID: 1493209310282104147, guid: 6fc0acfb88a27d54bb4fb281e912e253, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.1
+      objectReference: {fileID: 0}
     - target: {fileID: 4370587484897013116, guid: 6fc0acfb88a27d54bb4fb281e912e253, type: 3}
       propertyPath: m_Sprite
       value: 
@@ -303,6 +315,10 @@ PrefabInstance:
     - target: {fileID: 4777901455048847436, guid: 6fc0acfb88a27d54bb4fb281e912e253, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4777901455048847436, guid: 6fc0acfb88a27d54bb4fb281e912e253, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.1
       objectReference: {fileID: 0}
     - target: {fileID: 8785561823920426916, guid: 6fc0acfb88a27d54bb4fb281e912e253, type: 3}
       propertyPath: m_Size.x
@@ -374,7 +390,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9004721185725440106, guid: 6fc0acfb88a27d54bb4fb281e912e253, type: 3}
       propertyPath: m_TagString
-      value: PollenSource
+      value: Untagged
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6fc0acfb88a27d54bb4fb281e912e253, type: 3}

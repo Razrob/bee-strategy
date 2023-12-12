@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: PollenConfig
   m_EditorClassIdentifier: 
   _id: 0
-  _icon: {fileID: 21300000, guid: c11e1e023ef5de843b411bd9b5632a41, type: 3}
+  _icon: {fileID: 21300000, guid: e0f8b8a55375be14cbbd204f7bd36e0c, type: 3}
