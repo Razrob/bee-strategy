@@ -22,7 +22,7 @@ public class ConstructionTester : CycleInitializerBase
                     return;
 
                 BuildingProgressConstruction progressConstruction = 
-                    _constructionFactory.Create<BuildingProgressConstruction>(ConstructionID.Building_Progress_Construction);
+                    _constructionFactory.Create<BuildingProgressConstruction>(ConstructionID.BuildingProgressConstruction);
                 progressConstruction.transform.position = position;
                 FrameworkCommander.GlobalData.ConstructionsRepository.AddConstruction(position.ToInt(), progressConstruction);
 

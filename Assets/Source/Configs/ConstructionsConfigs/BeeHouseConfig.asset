@@ -24,3 +24,10 @@ MonoBehaviour:
       _cells:
       - Key: 1
         Value: 10
+  - maxHealPoints: 2000
+    levelUpCost:
+      _cells: []
+    resourceCapacity:
+      _cells:
+      - Key: 1
+        Value: 20

@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEngine;
 
 namespace Unit
@@ -7,9 +8,12 @@ namespace Unit
         protected override void OnUpdate()
         {
             var time = Time.deltaTime;
-            foreach (var units in FrameworkCommander.GlobalData.UnitRepository.Units)
-                foreach (var unit in units.Value)
+            foreach (var unitsPair in FrameworkCommander.GlobalData.UnitRepository.Units)
+            {
+                var units = unitsPair.Value.ToList();
+                foreach (var unit in units)
                     unit.HandleUpdate(time);
+            }
         }
     }
 }

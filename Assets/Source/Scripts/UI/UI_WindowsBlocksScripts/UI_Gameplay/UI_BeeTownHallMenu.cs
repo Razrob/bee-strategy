@@ -46,7 +46,7 @@ public class UI_BeeTownHallMenu : UI_EvolveConstructionScreenBase<BeeTownHall>
 
     public void _RecruitingWorkerBee()
     {
-        _construction.RecruitingWorkerBee(UnitType.WorkerBee);
+        _construction.RecruitUnit(UnitType.WorkerBee);
     }
 
     private void OnDisable()

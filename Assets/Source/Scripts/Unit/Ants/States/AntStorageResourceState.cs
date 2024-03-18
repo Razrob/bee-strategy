@@ -1,3 +1,4 @@
+using Construction.TownHalls;
 using Constructions;
 using Unit.ProfessionsCore;
 using UnityEngine;
@@ -22,19 +23,18 @@ namespace Unit.Ants.States
             if (_ant.CurProfessionType != ProfessionType.Worker ||
                 !_ant.Profession.TryCast(out _workerProfession) ||
                 !_workerProfession.ResourceExtractionProcessor.GotResource ||
-                !_ant.CurrentPathData.Target.CastPossible<BeeTownHall>())
+                !_ant.CurrentPathData.Target.CastPossible<TownHallBase>())
             {
 #if UNITY_EDITOR
                 Debug.LogWarning($"Some problem: " +
                                  $"{_ant.CurProfessionType} | " +
                                  $"{!_ant.Profession.TryCast(out _workerProfession)} | " +
-                                 $"{!_ant.CurrentPathData.Target.CastPossible<BeeTownHall>()}");            
+                                 $"{!_ant.CurrentPathData.Target.CastPossible<TownHallBase>()}");            
 #endif
                 _ant.AutoGiveOrder(null);
                 return;
             }
             
-            ResourceGlobalStorage.ChangeValue(ResourceID.Pollen, _workerProfession.ResourceExtractionProcessor.ExtractionCapacity);
             _workerProfession.ResourceExtractionProcessor.StorageResources();
             
             _ant.AutoGiveOrder(null);

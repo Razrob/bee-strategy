@@ -111,7 +111,9 @@ namespace Unit.Ants
             switch (newProfession.ProfessionType)
             {
                 case (ProfessionType.Worker):
-                    var workerLogic = new AntWorkerProfession(this, newProfession as AntWorkerConfig, resource);
+                    var resourceRepository = ResourceGlobalStorage.ResourceRepository;
+                    var workerLogic = new AntWorkerProfession(this, newProfession as AntWorkerConfig,
+                        resourceRepository, resource);
                     Profession = workerLogic;
                     break;
                 case (ProfessionType.MeleeWarrior):

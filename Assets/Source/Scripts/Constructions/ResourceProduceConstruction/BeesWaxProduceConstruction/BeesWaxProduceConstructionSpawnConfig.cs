@@ -2,8 +2,8 @@
 
 namespace Constructions
 {
-    [CreateAssetMenu(fileName = "BeesWaxProduceConstructionConfig",
-        menuName = "Config/BeesWaxProduceConstructionConfig")]
+    [CreateAssetMenu(fileName = nameof(BeesWaxProduceConstructionSpawnConfig),
+        menuName = "Configs/Constructions/SpawnConfigs/" + nameof(BeesWaxProduceConstructionSpawnConfig))]
     public class BeesWaxProduceConstructionSpawnConfig : ScriptableObject, ISingleConfig
     {
         [SerializeField] private ConstructionSpawnConfiguration<BeesWaxProduceConstruction> _configuration;

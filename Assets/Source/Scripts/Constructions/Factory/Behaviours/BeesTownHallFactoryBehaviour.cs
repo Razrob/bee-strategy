@@ -5,7 +5,7 @@ public class BeesTownHallFactoryBehaviour : ConstructionFactoryBehaviourBase
 {
     [Inject] private readonly BeeTownHallSpawnConfig _config;
     
-    public override ConstructionType ConstructionType => ConstructionType.Bees_Town_Hall;
+    public override ConstructionType ConstructionType => ConstructionType.BeeTownHall;
 
     public override TConstruction Create<TConstruction>(ConstructionID constructionID)
     {

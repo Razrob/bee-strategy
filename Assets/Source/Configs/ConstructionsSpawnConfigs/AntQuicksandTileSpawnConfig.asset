@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 910ef2c0c04b4621b979d55a074fceeb, type: 3}
+  m_Name: AntQuicksandTileSpawnConfig
+  m_EditorClassIdentifier: 
+  <Configuration>k__BackingField:
+    <ConstructionPrefab>k__BackingField: {fileID: 4805121516226685362, guid: 773692e33f3407b45a70871a6647ae7b, type: 3}
+    <SkinPrefab>k__BackingField: {fileID: 0}
+    <Rotation>k__BackingField: {x: 0, y: 0, z: 0, w: 0}

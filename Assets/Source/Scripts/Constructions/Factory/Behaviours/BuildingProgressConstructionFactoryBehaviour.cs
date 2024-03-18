@@ -4,7 +4,7 @@ public class BuildingProgressConstructionFactoryBehaviour : ConstructionFactoryB
 {
     [Inject] private readonly BuildingProgressConstructionConfig _constructionConfig;
 
-    public override ConstructionType ConstructionType => ConstructionType.Building_Progress_Construction;
+    public override ConstructionType ConstructionType => ConstructionType.BuildingProgressConstruction;
 
     public override TConstruction Create<TConstruction>(ConstructionID constructionID)
     {

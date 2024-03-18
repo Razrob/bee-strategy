@@ -107,9 +107,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c21734425f317cc4ebf27dd146c598c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  affiliationEnum: 10
+  unitsSpawnPosition: {fileID: 4064212705378577584}
   config: {fileID: 11400000, guid: 12cc3c05425c9454c9735fee73c8d5eb, type: 2}
-  beesSpawnPosition: {fileID: 4064212705378577584}
 --- !u!65 &6453320288001796886
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -1,3 +1,4 @@
+using MoveSpeedChangerSystem;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -7,7 +8,6 @@ public abstract class MovingUnit : UnitBase
     [SerializeField] private SomeTestAbility_1 _ability1;
     [SerializeField] private SomeTestAbility_2 _ability2;
 
-    private int _containsStickyTilesCount;
     private float _startMaxSpeed;
 
     public Vector3 Velocity => _navMeshAgent.velocity;
@@ -19,12 +19,13 @@ public abstract class MovingUnit : UnitBase
 
         _startMaxSpeed = _navMeshAgent.speed;
 
+        MoveSpeedChangerProcessor = new MoveSpeedChangerProcessor(_navMeshAgent, _startMaxSpeed);
+        
         OnAwake();
     }
     
     private void Start()
     {
-        FrameworkCommander.GlobalData.UnitRepository.AddUnit(this);
         UnitPool.Instance.UnitCreation(this);
         
         OnStart();
@@ -33,6 +34,8 @@ public abstract class MovingUnit : UnitBase
     public override void HandleUpdate(float time)
     {
         base.HandleUpdate(time);
+        
+        MoveSpeedChangerProcessor.HandleUpdate(time);
         
         foreach (var ability in _abilites)
             ability.OnUpdate(Time.deltaTime);
@@ -50,16 +53,6 @@ public abstract class MovingUnit : UnitBase
     public void Warp(Vector3 position)
     {
         _navMeshAgent.Warp(position);
-    }
-        
-    public void ChangeContainsStickyTiles(int delta)
-    {
-        _containsStickyTilesCount += delta;
-  
-        if (_containsStickyTilesCount is 0)
-            _navMeshAgent.speed = _startMaxSpeed;
-        else
-            _navMeshAgent.speed *= 1.75f;
     }
     
     public virtual void GiveOrder(GameObject target, Vector3 position) 

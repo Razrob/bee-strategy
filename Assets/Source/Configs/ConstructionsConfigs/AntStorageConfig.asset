@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07850406cdf3430a92f6d8ee66cd78e4, type: 3}
+  m_Name: AntStorageConfig
+  m_EditorClassIdentifier: 
+  buyCost:
+    _cells: []
+  levels:
+  - maxHealPoints: 500
+    levelUpCost:
+      _cells: []
+    resourceCapacity:
+      _cells:
+      - Key: 0
+        Value: 500
+      - Key: 10
+        Value: 500
+      - Key: 30
+        Value: 500

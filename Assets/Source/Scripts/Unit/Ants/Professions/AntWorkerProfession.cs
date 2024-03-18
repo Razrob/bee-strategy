@@ -6,8 +6,8 @@ namespace Unit.Ants.Professions
 {
     public class AntWorkerProfession : WorkerProfession
     {
-        public AntWorkerProfession(AntBase ant, AntWorkerConfig antHandItem, GameObject resourceSkin)
-            : base(ant, antHandItem.InteractionRange, antHandItem.GatheringCapacity, antHandItem.GatheringTime, resourceSkin)
+        public AntWorkerProfession(AntBase ant, AntWorkerConfig antHandItem, ResourceRepository resourceRepository, GameObject resourceSkin)
+            : base(ant, antHandItem.InteractionRange, antHandItem.GatheringCapacity, antHandItem.GatheringTime, resourceRepository, resourceSkin)
         { }
     }
 }

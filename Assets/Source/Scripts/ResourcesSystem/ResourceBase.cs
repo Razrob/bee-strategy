@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class ResourceBase: ResourceStorage
+public class ResourceBase : ResourceStorage
 {
     private ResourceID _id;
     private Sprite _icon;

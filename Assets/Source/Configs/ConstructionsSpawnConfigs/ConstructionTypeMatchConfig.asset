@@ -23,7 +23,43 @@ MonoBehaviour:
     ConstructionsID: 0a000000
   - ConstructionType: 4
     ConstructionsID: 0f000000
+  - ConstructionType: 16
+    ConstructionsID: 1e000000
   - ConstructionType: 5
     ConstructionsID: 14000000
   - ConstructionType: 10
     ConstructionsID: 19000000
+  - ConstructionType: 40
+    ConstructionsID: 28000000
+  - ConstructionType: 50
+    ConstructionsID: 32000000
+  - ConstructionType: 60
+    ConstructionsID: 3c000000
+  - ConstructionType: 200
+    ConstructionsID: c8000000
+  - ConstructionType: 210
+    ConstructionsID: d2000000
+  - ConstructionType: 220
+    ConstructionsID: dc000000
+  - ConstructionType: 230
+    ConstructionsID: e6000000
+  - ConstructionType: 240
+    ConstructionsID: f0000000
+  - ConstructionType: 250
+    ConstructionsID: fa000000
+  - ConstructionType: 260
+    ConstructionsID: 04010000
+  - ConstructionType: 270
+    ConstructionsID: 0e010000
+  - ConstructionType: 280
+    ConstructionsID: 18010000
+  - ConstructionType: 290
+    ConstructionsID: 22010000
+  - ConstructionType: 300
+    ConstructionsID: 2c010000
+  - ConstructionType: 310
+    ConstructionsID: 36010000
+  - ConstructionType: 320
+    ConstructionsID: 40010000
+  - ConstructionType: 330
+    ConstructionsID: 4a010000

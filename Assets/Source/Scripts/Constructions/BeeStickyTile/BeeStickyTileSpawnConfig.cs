@@ -2,7 +2,7 @@
 
 namespace Constructions
 {
-    [CreateAssetMenu(fileName = "StickyTileConfig", menuName = "Config/StickyTileConfig")]
+    [CreateAssetMenu(fileName = nameof(BeeStickyTileSpawnConfig), menuName = "Configs/Constructions/SpawnConfigs/" + nameof(BeeStickyTileSpawnConfig))]
     public class BeeStickyTileSpawnConfig : ScriptableObject, ISingleConfig
     {
         [SerializeField] private ConstructionSpawnConfiguration<BeeStickyTile> _configuration;

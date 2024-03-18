@@ -1,4 +1,5 @@
-﻿using Constructions;
+﻿using Construction.TownHalls;
+using Constructions;
 using Unit.ProfessionsCore.Processors;
 using UnityEngine;
 
@@ -11,10 +12,10 @@ namespace Unit.ProfessionsCore
         public ResourceExtractionProcessor ResourceExtractionProcessor { get; private set; }
         
         public WorkerProfession(UnitBase unit, float interactionRange,  int gatheringCapacity, float extractionTime, 
-            GameObject resourceSkin)
+            ResourceRepository resourceRepository, GameObject resourceSkin)
             : base(unit, interactionRange)
         {
-            ResourceExtractionProcessor = new ResourceExtractionProcessor(gatheringCapacity, extractionTime, resourceSkin);
+            ResourceExtractionProcessor = new ResourceExtractionProcessor(gatheringCapacity, extractionTime, resourceRepository, resourceSkin);
         }
 
         public override void HandleUpdate(float time)
@@ -39,7 +40,9 @@ namespace Unit.ProfessionsCore
                     if (target.CastPossible<BuildingProgressConstruction>())
                         return new UnitPathData(target, UnitPathType.Build_Construction);
                 
-                    if (target.CastPossible<BeeTownHall>() && ResourceExtractionProcessor.GotResource)
+                    if (target.Affiliation == Affiliation &&
+                        target.CastPossible<TownHallBase>() &&
+                        ResourceExtractionProcessor.GotResource)
                         return new UnitPathData(target, UnitPathType.Storage_Resource);  
                     break;                
             }
@@ -75,7 +78,8 @@ namespace Unit.ProfessionsCore
                     break;
                 case UnitPathType.Storage_Resource:
                     if (target.TargetType == UnitTargetType.Construction &&
-                        target.CastPossible<BeeTownHall>() &&
+                        target.Affiliation == Affiliation &&
+                        target.CastPossible<TownHallBase>() &&
                         ResourceExtractionProcessor.GotResource)
                         return UnitPathType.Storage_Resource;
                     break;

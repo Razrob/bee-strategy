@@ -67,11 +67,11 @@ public abstract class TriggerZone : MonoBehaviour
         OnExit(component);
         ExitEvent?.Invoke(component);
 
-        if (_refreshEnteredComponentsAfterExit && _containsComponents.Count > 0)
-        {
-            OnEnter(_containsComponents.First());
-            EnterEvent?.Invoke(_containsComponents.First());
-        }
+        // if (_refreshEnteredComponentsAfterExit && _containsComponents.Count > 0)
+        // {
+        //     OnEnter(_containsComponents.First());
+        //     EnterEvent?.Invoke(_containsComponents.First());
+        // }
     }
     
     private void OnDisable()

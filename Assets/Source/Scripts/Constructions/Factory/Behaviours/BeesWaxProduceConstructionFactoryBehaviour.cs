@@ -5,7 +5,7 @@ public class BeesWaxProduceConstructionFactoryBehaviour : ConstructionFactoryBeh
 {
     [Inject] private readonly BeesWaxProduceConstructionSpawnConfig _beesWaxProduceConstructionConfig;
 
-    public override ConstructionType ConstructionType => ConstructionType.Bees_Wax_Produce_Construction;
+    public override ConstructionType ConstructionType => ConstructionType.BeeWaxProduceConstruction;
 
     public override TConstruction Create<TConstruction>(ConstructionID constructionID)
     {

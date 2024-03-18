@@ -4,7 +4,7 @@ public class DefaultConstructionFactoryBehaviour : ConstructionFactoryBehaviourB
 {
     [Inject] private readonly DefaultConstructionConfig _defaultConstructionConfig;
 
-    public override ConstructionType ConstructionType => ConstructionType.Test_Construction;
+    public override ConstructionType ConstructionType => ConstructionType.TestConstruction;
 
     public override TConstruction Create<TConstruction>(ConstructionID constructionID)
     {

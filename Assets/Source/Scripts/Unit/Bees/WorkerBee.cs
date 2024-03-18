@@ -28,7 +28,9 @@ namespace Unit.Bees
             base.OnElementExtract();
             
             _healthStorage.SetValue(_healthStorage.Capacity);
-            _workerProfession = new WorkerProfession(this, beeWorkerConfig.InteractionRange, beeWorkerConfig.GatheringCapacity, beeWorkerConfig.GatheringTime, resourceSkin);
+            var resourceRepository = ResourceGlobalStorage.ResourceRepository;
+            _workerProfession = new WorkerProfession(this, beeWorkerConfig.InteractionRange,
+                beeWorkerConfig.GatheringCapacity, beeWorkerConfig.GatheringTime, resourceRepository, resourceSkin);
             resourceSkin.SetActive(false);
 
             var stateBases = new List<EntityStateBase>()

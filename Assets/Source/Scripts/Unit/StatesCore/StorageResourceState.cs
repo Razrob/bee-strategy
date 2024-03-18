@@ -1,4 +1,4 @@
-using Constructions;
+using Construction.TownHalls;
 using Unit.ProfessionsCore;
 using UnityEngine;
 
@@ -20,17 +20,16 @@ namespace Unit.States
         public override void OnStateEnter()
         {
             if (!_workerProfession.ResourceExtractionProcessor.GotResource ||
-                !_unit.CurrentPathData.Target.CastPossible<BeeTownHall>())
+                !_unit.CurrentPathData.Target.CastPossible<TownHallBase>())
             {
 #if UNITY_EDITOR
                 Debug.LogWarning($"Some problem: " +
-                                 $"{!_unit.CurrentPathData.Target.CastPossible<BeeTownHall>()}");            
+                                 $"{!_unit.CurrentPathData.Target.CastPossible<TownHallBase>()}");            
 #endif
                 _unit.AutoGiveOrder(null);
                 return;
             }
             
-            ResourceGlobalStorage.ChangeValue(ResourceID.Pollen, _workerProfession.ResourceExtractionProcessor.ExtractionCapacity);
             _workerProfession.ResourceExtractionProcessor.StorageResources();
             
             _unit.AutoGiveOrder(null);

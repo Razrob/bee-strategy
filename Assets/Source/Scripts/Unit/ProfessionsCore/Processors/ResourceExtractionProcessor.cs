@@ -8,6 +8,7 @@ namespace Unit.ProfessionsCore.Processors
     {
         private readonly Timer _extractionTimer;
         private readonly GameObject _resourceSkin;
+        private readonly ResourceRepository _resourceRepository;
         
         public int ExtractionCapacity  { get; private set; }
         public ResourceID ExtractedResourceID { get; private set; }
@@ -17,17 +18,15 @@ namespace Unit.ProfessionsCore.Processors
         public event Action OnResourceExtracted;
         public event Action OnStorageResources;
         
-        public ResourceExtractionProcessor(int gatheringCapacity, float extractionTime, GameObject resourceSkin)
+        public ResourceExtractionProcessor(int gatheringCapacity, float extractionTime, ResourceRepository resourceRepository, GameObject resourceSkin)
         {
             ExtractionCapacity = gatheringCapacity;
             _extractionTimer = new Timer(extractionTime, 0, true);
             _extractionTimer.OnTimerEnd += ExtractResource;
+            _resourceRepository = resourceRepository;
             _resourceSkin = resourceSkin;
             HideResource();
         }
-
-        private void ShowResource() => _resourceSkin.SetActive(true);
-        private void HideResource() => _resourceSkin.SetActive(false);
         
         public void HandleUpdate(float time) => _extractionTimer.Tick(time);
         
@@ -55,16 +54,20 @@ namespace Unit.ProfessionsCore.Processors
         }
         
         /// <summary>
-        /// Inform worker logic about put resource in storage
+        /// Give order put resource in storage
         /// </summary>
         public void StorageResources()
         {
             if(!GotResource) return;
             
+            _resourceRepository.ChangeValue(ExtractedResourceID, ExtractionCapacity);
             GotResource = false;
             HideResource();
             OnStorageResources?.Invoke();
         }
+        
+        private void ShowResource() => _resourceSkin.SetActive(true);
+        private void HideResource() => _resourceSkin.SetActive(false);
         
         private void ExtractResource()
         {

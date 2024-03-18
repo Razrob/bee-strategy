@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0e1075aedf4b0f49a74b5bdb4ed5de2, type: 3}
   m_Name: BeeHouseSpawnConfig
   m_EditorClassIdentifier: 
-  _configuration:
+  <Configuration>k__BackingField:
     <ConstructionPrefab>k__BackingField: {fileID: -4589124477280040743, guid: eb03e7e86e87e7e4186e4e1098d54590, type: 3}
     <SkinPrefab>k__BackingField: {fileID: 0}
     <Rotation>k__BackingField: {x: 0, y: 0, z: 0, w: 0}

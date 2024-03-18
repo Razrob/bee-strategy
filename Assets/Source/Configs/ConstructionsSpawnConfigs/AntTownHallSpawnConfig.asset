@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfa5512f1a2045ac95356bff46278339, type: 3}
+  m_Name: AntTownHallSpawnConfig
+  m_EditorClassIdentifier: 
+  <Configuration>k__BackingField:
+    <ConstructionPrefab>k__BackingField: {fileID: 7124924816069639340, guid: 9944bb5c264b252419372b85c38a727c, type: 3}
+    <SkinPrefab>k__BackingField: {fileID: 0}
+    <Rotation>k__BackingField: {x: 0, y: 0, z: 0, w: 0}

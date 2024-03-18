@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 235312a74e9f46448ecba647e4b7ee11, type: 3}
+  m_Name: ButterflyHouseSpawnConfig
+  m_EditorClassIdentifier: 
+  <Configuration>k__BackingField:
+    <ConstructionPrefab>k__BackingField: {fileID: 3595684004249969761, guid: f78ea393df3b9a14b9fb0ebd9afe7c4a, type: 3}
+    <SkinPrefab>k__BackingField: {fileID: 0}
+    <Rotation>k__BackingField: {x: 0, y: 0, z: 0, w: 0}

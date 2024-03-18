@@ -5,6 +5,7 @@ public abstract class ResourceProduceCoreBase
     protected abstract ResourceProduceProccessInfoBase _produceProccessInfo { get; }
     protected ResourceStorage _producedResource;
 
+    public bool ProduceResourceIsFull => _producedResource.CurrentValue >= _producedResource.Capacity;
     public IReadOnlyResourceStorage ProducedResource => _producedResource;
     public ResourceID TargetResourceID => _produceProccessInfo.TargetResourceID;
 

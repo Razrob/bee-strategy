@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 using UnityEngine.EventSystems;
-using System.Linq;
 using Constructions;
 
 public class UserBuilder : CycleInitializerBase
@@ -12,20 +10,16 @@ public class UserBuilder : CycleInitializerBase
     [Inject] private readonly DiContainer _diContainer;
     
     [SerializeField] private SerializableDictionary<ConstructionID, GameObject> constructionMovableModels;
-    [SerializeField] private ConstructionBase[] constructions;
-    private Dictionary<ConstructionID, ConstructionBase> _constructionWithID;
 
     private GameObject _currentConstructionMovableModel;
     private ConstructionID _currentConstructionID;
 
-    private bool _spawnConstruction = false;
-    private float _numberTownHall = 0;
+    private bool _spawnConstruction;
+    private float _numberTownHall;
     private UnitPool _pool;
     
     protected override void OnInit()
     {
-        _constructionWithID = constructions.ToDictionary(x => x.ConstructionID, x => x);
-        
         GameObject controller = GameObject.FindGameObjectWithTag("GameController");
         _pool = controller.GetComponent<UnitPool>();
     }
@@ -131,7 +125,7 @@ public class UserBuilder : CycleInitializerBase
     {
         construction = null;
 
-        if (id == ConstructionID.Bees_Town_Hall && _numberTownHall >= 1)
+        if (id == ConstructionID.BeeTownHall && _numberTownHall >= 1)
             return false;
         
         RaycastHit[] raycastHits = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition));
@@ -143,7 +137,7 @@ public class UserBuilder : CycleInitializerBase
         if (FrameworkCommander.GlobalData.ConstructionsRepository.ConstructionExist(position, false))
             return false;
 
-        if (id == ConstructionID.Bees_Town_Hall)
+        if (id == ConstructionID.BeeTownHall)
             _numberTownHall++;
         
         construction = SpawnConstruction(id, position);
@@ -153,7 +147,7 @@ public class UserBuilder : CycleInitializerBase
     
     private BuildingProgressConstruction SpawnConstruction(ConstructionID id, Vector3 position)
     {
-        BuildingProgressConstruction progressConstruction = _constructionFactory.Create<BuildingProgressConstruction>(ConstructionID.Building_Progress_Construction);
+        BuildingProgressConstruction progressConstruction = _constructionFactory.Create<BuildingProgressConstruction>(ConstructionID.BuildingProgressConstruction);
         progressConstruction.transform.position = position;
         FrameworkCommander.GlobalData.ConstructionsRepository.AddConstruction(position, progressConstruction);
                 

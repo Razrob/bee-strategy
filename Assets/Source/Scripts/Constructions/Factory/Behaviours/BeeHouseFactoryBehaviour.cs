@@ -10,7 +10,7 @@ public class BeeHouseFactoryBehaviour : ConstructionFactoryBehaviourBase
 
     public override TConstruction Create<TConstruction>(ConstructionID constructionID)
     {
-        ConstructionSpawnConfiguration<BeeHouse> configuration = _beeHouseSpawnConfig.GetConfiguration();
+        ConstructionSpawnConfiguration<BeeHouse> configuration = _beeHouseSpawnConfig.Configuration;
 
         TConstruction construction = DiContainer.InstantiatePrefab(configuration.ConstructionPrefab,
                 configuration.ConstructionPrefab.transform.position, configuration.Rotation, null)

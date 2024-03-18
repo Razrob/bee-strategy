@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2719f800bc9d4c49911017b40ec4fb3a, type: 3}
+  m_Name: BeeWaxTowerConfig
+  m_EditorClassIdentifier: 
+  buyCost:
+    _cells: []
+  levels:
+  - maxHealPoints: 10
+    levelUpCost:
+      _cells: []
+    resourceCapacity:
+      _cells: []
+    <ProjectilesType>k__BackingField: 30
+    <ProjectilesCount>k__BackingField: 1
+    <SpawnPause>k__BackingField: 0.5
+    <Damage>k__BackingField: 5
+    <Cooldown>k__BackingField: 2
+    <MoveSpeedChangerConfig>k__BackingField:
+      <Power>k__BackingField: -25
+      <Time>k__BackingField: 5
+  - maxHealPoints: 750
+    levelUpCost:
+      _cells: []
+    resourceCapacity:
+      _cells: []
+    <ProjectilesType>k__BackingField: 30
+    <ProjectilesCount>k__BackingField: 2
+    <SpawnPause>k__BackingField: 0.5
+    <Damage>k__BackingField: 5
+    <Cooldown>k__BackingField: 2
+    <MoveSpeedChangerConfig>k__BackingField:
+      <Power>k__BackingField: -25
+      <Time>k__BackingField: 5
+  - maxHealPoints: 1000
+    levelUpCost:
+      _cells: []
+    resourceCapacity:
+      _cells: []
+    <ProjectilesType>k__BackingField: 30
+    <ProjectilesCount>k__BackingField: 2
+    <SpawnPause>k__BackingField: 0.5
+    <Damage>k__BackingField: 5
+    <Cooldown>k__BackingField: 2
+    <MoveSpeedChangerConfig>k__BackingField:
+      <Power>k__BackingField: -50
+      <Time>k__BackingField: 5

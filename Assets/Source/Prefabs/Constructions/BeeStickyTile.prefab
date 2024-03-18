@@ -163,12 +163,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9564b0cd11ca294ab9f0f563a46a689, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  affiliationEnum: 10
-  _costValues:
-    _cells:
-    - Key: 0
-      Value: 3
-  _triggerBehaviour: {fileID: 1029462084464332525}
+  config: {fileID: 11400000, guid: f586709fc51efe6408af7aafaf32fbc0, type: 2}
+  stickZone: {fileID: 1029462084464332525}
 --- !u!65 &926670440681373967
 BoxCollider:
   m_ObjectHideFlags: 0

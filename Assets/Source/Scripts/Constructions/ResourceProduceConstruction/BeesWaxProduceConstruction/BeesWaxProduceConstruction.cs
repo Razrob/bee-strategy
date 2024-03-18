@@ -10,8 +10,9 @@ namespace Constructions
         private ResourceConversionCore _resourceConversionCore;
         private ResourceProduceConstructionState _produceConstructionState;
 
+        public override AffiliationEnum Affiliation => AffiliationEnum.Bees;
+        public override ConstructionID ConstructionID => ConstructionID.BeeWaxProduceConstruction;
         public override ResourceProduceConstructionState ProduceConstructionState => _produceConstructionState;
-        public override ConstructionID ConstructionID => ConstructionID.Bees_Wax_Produce_Construction;
         public override ResourceConversionCore ResourceConversionCore => _resourceConversionCore;
 
         public IConstructionLevelSystem LevelSystem { get; private set; }

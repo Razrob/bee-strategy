@@ -6,9 +6,9 @@ namespace Projectiles
     public abstract class ProjectileBase : MonoBehaviour, IDamageApplicator, IPoolable<ProjectileBase, ProjectileType>,
         IPoolEventListener
     {
-        [field: SerializeField] public float Damage { get; private set; }
         [field: SerializeField] public float MoveSpeed { get; private set; }
 
+        public float Damage { get; private set; }
         public abstract ProjectileType ProjectileType { get; }
         public ProjectileType Identifier => ProjectileType;
         
@@ -24,6 +24,7 @@ namespace Projectiles
         }
 
         public void SetDamage(IDamageApplicator damage) => Damage = damage.Damage;
+        public void SetDamage(float damage) => Damage = damage;
 
         public void SetTarget(IUnitTarget target)
         {

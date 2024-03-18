@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using MiniMapSystem;
+using MoveSpeedChangerSystem;
+using StickySystem;
 using Unit.ProfessionsCore;
 
 public abstract class UnitBase : MonoBehaviour, IUnit, ITriggerable, IDamagable, IUnitTarget, IMiniMapObject,
-    SelectableSystem.ISelectable, IPoolable<UnitBase, UnitType>, IPoolEventListener
+    SelectableSystem.ISelectable, IPoolable<UnitBase, UnitType>, IPoolEventListener, 
+    IMoveSpeedChangeable, IStickeable
 {
     [SerializeField] private UnitVisibleZone _unitVisibleZone;
     [SerializeField] private ProfessionInteractionZone _professionInteractionZone;
@@ -19,6 +22,8 @@ public abstract class UnitBase : MonoBehaviour, IUnit, ITriggerable, IDamagable,
     public bool IsActive { get; protected set; }
     public Vector3 TargetMovePosition { get; protected set; }
     protected abstract ProfessionBase CurrentProfession { get; }
+    public MoveSpeedChangerProcessor MoveSpeedChangerProcessor { get; protected set; }
+    public StickyProcessor StickyProcessor { get; } = new StickyProcessor();
 
     public bool IsDied => _healthStorage.CurrentValue < 1f;
     public Transform Transform => transform;
